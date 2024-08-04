@@ -1,6 +1,6 @@
 const { REST, Routes, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { clientId, guildId, token } = require('../../../config.json');
-const { logger } = require('../../utils/tools/logger');
+const { logger } = require('../../utils/logger/logger');
 const fs = require('node:fs');
 const path = require('node:path');
 

@@ -1,7 +1,7 @@
 const { tierOrder, rankOrder } = require('../tools/rankUtils');
-const LastRank = require('../../schemas/lastRank');
+const LastRank = require('../../database/schemas/lastRank');
 const { searchRank } = require('../api/league-v4');
-const { logger } = require('../tools/logger');
+const { logger } = require('../utils/tools/logger');
 
 async function updateDaily(accountId) {
     return await updatePeriodicalRank(accountId, 'Daily');

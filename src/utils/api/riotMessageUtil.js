@@ -19,7 +19,7 @@ const tierEmojiDict = {
     'GOLD': '<:gold:1261427464522039436>',
     'PLATINUM': '<:platinum:1261427498541912156>',
     'EMERALD': '<:emerald:1261427532100669551>',
-    'DIAMOND': '<:diamond:1261427532100669551>',
+    'DIAMOND': '<:diamond:1261427563385847940>',
     'MASTER': '<:master:1261427596294623283>',
     'GRANDMASTER': '<:grandmaster:1261427620994613339>',
     'CHALLENGER': '<:challenger:1261427653123244153>'

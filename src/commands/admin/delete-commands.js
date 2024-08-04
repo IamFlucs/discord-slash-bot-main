@@ -1,6 +1,6 @@
 const { REST, Routes, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { clientId, token } = require('../../../config.json');
-const { logger } = require('../../utils/tools/logger.js');
+const { logger } = require('../../utils/logger/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()

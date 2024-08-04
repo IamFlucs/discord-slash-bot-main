@@ -1,12 +1,12 @@
-const { tierDict, tierEmojiDict, gameTypeDict, rankDict } = require('../tools/riotMessageUtil');
-const { comparePlayersByRank } = require('../tools/comparePlayers');
-const { searchCurrentGame } = require('../api/spectator-v5');
-const { getTimeDifference } = require ('../tools/timestamp');
-const { rankVariation } = require('../content/updateRanks');
-const { searchRank } = require('../api/league-v4');
-const { logger } = require('../tools/logger');
-const Player = require('../../schemas/player');
-const LeagueAccount = require('../../schemas/league_account');
+const { tierDict, tierEmojiDict, gameTypeDict, rankDict } = require('../../utils/api/riotMessageUtil');
+const { comparePlayersByRank } = require('../../utils/player/comparePlayers');
+const { searchCurrentGame } = require('../../api/riot/spectator-v5');
+const { getTimeDifference } = require ('../../utils/date/timestamp');
+const { rankVariation } = require('../../database/updateRanks');
+const { searchRank } = require('../../api/riot/league-v4');
+const { logger } = require('../../utils/logger/logger');
+const Player = require('../../database/schemas/player');
+const LeagueAccount = require('../../database/schemas/league_account');
 
 /**
  * This function retrieves the IDs of guild members, checks whether they are registered in the database

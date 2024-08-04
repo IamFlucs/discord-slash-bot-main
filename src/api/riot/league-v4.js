@@ -1,21 +1,22 @@
 const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../tools/logger');
+const { logger } = require('../../utils/logger/logger');
 
 /**
  * Search for a summoner by game name, region, and tag.
- * @param {string} gameName - The game name of the summoner.
- * @param {string} region - The region of the summoner.
- * @param {string} tag - The tag of the summoner.
+ * @param {string} summonerId - The summonerData.id.
+ * @param {string} subRegion - The region of the summoner.
  * @returns {Promise<Object>} - A promise that resolves to the summoner data.
  */
-async function searchAccount(gameName, region, tag) {
-    const riotURL = `.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tag}`;
-    const fetchAccount = `https://${region}${riotURL}?api_key=${riotApiKey}`;
+async function searchRank(summonerId, subRegion) {
+    const riotURL = `.api.riotgames.com/lol/league/v4/entries/by-summoner/`;
+    const fetchSummoner = `https://${subRegion}${riotURL}${summonerId}?api_key=${riotApiKey}`;
 
     try {
-        const response = await axios.get(fetchAccount);
+        const response = await axios.get(fetchSummoner);
+        // /* DEBUG */ logger.log('API response:', JSON.stringify(response.data, null, 2));
         return response.data;
+
     } catch (error) {
         // /* DEBUG */ logger.log('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
 
@@ -74,9 +75,4 @@ async function searchAccount(gameName, region, tag) {
     }
 }
 
-// {
-//     "puuid": "0Z6K4rkBJZJNFbQXnPHfs4fRsjVyRiIjpwo_...",
-//     "gameName": "Mr Flucs",
-//     "tagLine": "EUW"
-// }
-module.exports = { searchAccount };
+module.exports = { searchRank };

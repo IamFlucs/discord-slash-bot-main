@@ -1,4 +1,4 @@
-const { logger } = require('../../utils/tools/logger.js')
+const { logger } = require('../../utils/logger/logger.js')
 
 module.exports = {
 	name: 'interactionCreate',

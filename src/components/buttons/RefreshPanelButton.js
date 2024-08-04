@@ -1,11 +1,11 @@
 const { ButtonInteraction, Client, GuildTextBasedChannel, MessageActionRow, MessageButton, MessageEmbed } = require('discord.js');
-const { updateInfoPanel } = require('../../utils/content/updateInfoPanel');
-const { createInfoPanel } = require('../../utils/content/createInfoPanel');
-const { createTimestamp } = require('../../utils/tools/timestamp');
-const { updateRanks } = require('../../utils/content/updateRanks');
-const { logger } = require('../../utils/tools/logger');
-const InfoChannel = require('../../schemas/info_channel');
-const InfoPanel = require('../../schemas/info_panel_message');
+const { updateInfoPanel } = require('../../content/infochannel/updateInfoPanel');
+const { createInfoPanel } = require('../../content/infochannel/createInfoPanel');
+const { createTimestamp } = require('../../utils/date/timestamp');
+const { updateRanks } = require('../../database/updateRanks');
+const { logger } = require('../../utils/logger/logger');
+const InfoChannel = require('../../database/schemas/info_channel');
+const InfoPanel = require('../../database/schemas/info_panel_message');
 
 /**
  * Handle refresh button interaction
@@ -28,8 +28,8 @@ module.exports = {
             ephemeral: true
         });
 
+        await updateRanks(client, guildId);
         await updateInfoPanel(client, guildId);
-        await updateRanks(guildId);
         
         // Delete the confirmation message
         await interaction.deleteReply();

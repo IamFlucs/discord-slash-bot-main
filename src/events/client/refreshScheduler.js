@@ -1,7 +1,8 @@
-const { logger } = require('../../utils/tools/logger');
-const { updateInfoPanel } = require('../../utils/content/updateInfoPanel');
+const { logger } = require('../../utils/logger/logger');
+const { updateInfoPanel } = require('../../content/infochannel/updateInfoPanel');
+const { updateRanks } = require('../../database/updateRanks');
 const cron = require('node-cron');
-const Guild = require('../../schemas/guild');
+const Guild = require('../../database/schemas/guild');
 
 /**
  * This events starts at boot and activate every {X} minutes. 
@@ -13,16 +14,17 @@ module.exports = {
 	async execute(client) {
 
         // Schedule the task every X minutes (for example, every 30 minutes)
-        cron.schedule(`*/20 * * * *`, async () => {
+        cron.schedule(`*/2 * * * *`, async () => {
             try {
                 // Fetch all guild IDs from the database
                 const guilds = await Guild.find({});
                 for (const guild of guilds) {
+                    await updateRanks(client, guild.guild_guildId);
                     await updateInfoPanel(client, guild.guild_guildId);
-                    await updateRanks(guild.guild_guildId);
                 }
             } catch (error) {
                 logger.error('Error fetching guilds or updating info panels:', error.message);
+                logger.error(error);
             }
         });
 

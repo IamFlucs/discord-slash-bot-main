@@ -1,5 +1,5 @@
-const { logger } = require('../../utils/tools/logger');
-const guildSchema = require('../../schemas/guild');
+const { logger } = require('../../utils/logger/logger');
+const guildSchema = require('../../database/schemas/guild');
 
 module.exports = {
 	name: 'guildCreate',

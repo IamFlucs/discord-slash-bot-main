@@ -1,11 +1,11 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-// const { searchAccount } = require('../../utils/api/account-v1');
-const { searchSummoner } = require('../../utils/api/summoner-v4');
-const { searchRank } = require('../../utils/api/league-v4');
-const { logger } = require('../../utils/tools/logger');
-const Player = require('../../schemas/player');
-const LeagueAccount = require('../../schemas/league_account');
-const { tierDict, tierEmojiDict, rankDict } = require('../../utils/tools/riotMessageUtil');
+// const { searchAccount } = require('../../api/riot/account-v1');
+const { searchSummoner } = require('../../api/riot/summoner-v4');
+const { searchRank } = require('../../api/riot/league-v4');
+const { logger } = require('../../utils/logger/logger');
+const Player = require('../../database/schemas/player');
+const LeagueAccount = require('../../database/schemas/league_account');
+const { tierDict, tierEmojiDict, rankDict } = require('../../utils/api/riotMessageUtil');
 
 /**
  * Perms: this command is for @everyone

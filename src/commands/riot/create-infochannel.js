@@ -1,10 +1,10 @@
 const { SlashCommandBuilder, PermissionsBitField, PermissionFlagsBits, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { createInfoPanel } = require('../../utils/content/createInfoPanel');
-const { createTimestamp } = require('../../utils/tools/timestamp');
-const { logger } = require('../../utils/tools/logger');
-const InfoChannel = require('../../schemas/info_channel');
-const InfoPanel = require('../../schemas/info_panel_message');
-const Guild = require('../../schemas/guild');
+const { createInfoPanel } = require('../../content/infochannel/createInfoPanel');
+const { createTimestamp } = require('../../utils/date/timestamp');
+const { logger } = require('../../utils/logger/logger');
+const InfoChannel = require('../../database/schemas/info_channel');
+const InfoPanel = require('../../database/schemas/info_panel_message');
+const Guild = require('../../database/schemas/guild');
 
 /**
  * Perms: @administrator.
@@ -62,6 +62,7 @@ module.exports = {
             const panelContent = await createInfoPanel(guildId, timestamp);
             const message = await infoChannel.send({
                 content: panelContent,
+                allowedMentions: { parse: [] },
                 components: [
                     new ActionRowBuilder().addComponents(
                         new ButtonBuilder()

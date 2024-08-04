@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, PermissionsBitField, PermissionFlagsBits } = require('discord.js');
-const { logger } = require('../../utils/tools/logger');
-const InfoChannel = require('../../schemas/info_channel');
-const InfoPanel = require('../../schemas/info_panel_message');
+const { logger } = require('../../utils/logger/logger');
+const InfoChannel = require('../../database/schemas/info_channel');
+const InfoPanel = require('../../database/schemas/info_panel_message');
 
 /**
  * Perms: @administrator.
