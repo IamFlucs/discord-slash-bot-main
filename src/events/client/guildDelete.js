@@ -1,6 +1,6 @@
-const { logger } = require('../../utils/tools/logger');
+const { logger } = require('../../utils/logger/logger');
 const client = require('../../../index');
-const guildSchema = require('../../schemas/guild');
+const guildSchema = require('../../database/schemas/guild');
 
 module.exports = {
 	name: 'guildDelete',

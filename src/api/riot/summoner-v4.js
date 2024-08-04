@@ -1,22 +1,28 @@
 const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../tools/logger.js');
+const { logger } = require('../../utils/logger/logger');
 
 /**
  * Search for a summoner by game name, region, and tag.
- * @param {string} summonerId - The summonerData.id.
+ * @param {string} puuid - The universal unique id.
  * @param {string} subRegion - The region of the summoner.
  * @returns {Promise<Object>} - A promise that resolves to the summoner data.
  */
-async function searchRank(summonerId, subRegion) {
-    const riotURL = `.api.riotgames.com/lol/league/v4/entries/by-summoner/`;
-    const fetchSummoner = `https://${subRegion}${riotURL}${summonerId}?api_key=${riotApiKey}`;
+async function searchSummoner(puuid, subRegion) {
+    const riotURL = `.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
+    const fetchSummoner = `https://${subRegion}${riotURL}${puuid}?api_key=${riotApiKey}`;
 
     try {
         const response = await axios.get(fetchSummoner);
         // /* DEBUG */ logger.log('API response:', JSON.stringify(response.data, null, 2));
-        return response.data;
 
+        // // Handle errors > à supprimer ?
+        // if (response.data.status) {
+        //     // Check for errors in the status object
+        //     const { status_code, message } = response.data.status;
+        //     throw new Error(`${status_code}: ${message}`);
+        // }
+        return response.data;
     } catch (error) {
         // /* DEBUG */ logger.log('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
 
@@ -75,4 +81,4 @@ async function searchRank(summonerId, subRegion) {
     }
 }
 
-module.exports = { searchRank };
+module.exports = { searchSummoner };

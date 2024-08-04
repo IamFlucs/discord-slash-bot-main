@@ -1,8 +1,9 @@
+const { GatewayIntentBits } = require('discord.js');
 const { createInfoPanel } = require('./createInfoPanel');
-const { createTimestamp } = require('../tools/timestamp');
-const { logger } = require('../tools/logger');
-const InfoChannel = require('../../schemas/info_channel');
-const InfoPanel = require('../../schemas/info_panel_message');
+const { createTimestamp } = require('../../utils/date/timestamp');
+const { logger } = require('../../utils/logger/logger');
+const InfoChannel = require('../../database/schemas/info_channel');
+const InfoPanel = require('../../database/schemas/info_panel_message');
 
 /**
  * Update the info panel message.
@@ -12,6 +13,13 @@ const InfoPanel = require('../../schemas/info_panel_message');
 async function updateInfoPanel(client, guildId) {
     try {
         const newTimestamp = createTimestamp();
+
+        // Check if the bot is still in the guild
+        const guild = client.guilds.cache.get(guildId);
+        if (!guild) {
+            // logger.error(`The bot is no longer a member of the guild with ID: ${guildId}`);
+            return;
+        }
 
         // Find the info Channel
         const searchedInfoChannel = await InfoChannel.findOne({ infoChannel_fk_guild: guildId });
@@ -47,9 +55,16 @@ async function updateInfoPanel(client, guildId) {
             return;
         }
 
+        // Check if the message author is the bot
+        if (message.author.id !== client.user.id) {
+            // logger.warning('The message was not authored by the bot. Skipping update.');
+            return;
+        }
+
         // Edit the message with the new timestamp
         await message.edit({
-            content: panelContent
+            content: panelContent,
+            allowedMentions: { parse: [] }
         });
 
         // logger.info(`Info panel updated successfully.`);
@@ -57,6 +72,7 @@ async function updateInfoPanel(client, guildId) {
     } catch (error) {
         logger.warning('/!\\ updateInfoPanel.js');
         logger.error(`Error refreshing info panel: ${error.message}`);
+        logger.error(error); 
     }
 }
 

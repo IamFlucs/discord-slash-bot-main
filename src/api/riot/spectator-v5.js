@@ -1,6 +1,6 @@
 const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../tools/logger');
+const { logger } = require('../../utils/logger/logger');
 
 /**
  * Search for a summoner by game name, region, and tag.

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const { logger } = require('../../utils/tools/logger.js');
+const { logger } = require('../../utils/logger/logger.js');
 const fs = require('node:fs');
 const path = require('node:path');
 

@@ -1,8 +1,8 @@
 const { Events, ChannelType } = require('discord.js');
-const { logger } = require('../../utils/tools/logger');
-const guildSchema = require('../../schemas/guild');
-const voiceSchema = require('../../schemas/jointocreate');
-const guild = require('../../schemas/guild');
+const { logger } = require('../../utils/logger/logger');
+const guildSchema = require('../../database/schemas/guild');
+const voiceSchema = require('../../database/schemas/jointocreate');
+const guild = require('../../database/schemas/guild');
 
 /**
  * This event detects when user joins a voice channel set up.

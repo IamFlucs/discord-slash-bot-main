@@ -1,6 +1,6 @@
 const { REST, Routes } = require('discord.js');
 const { token, clientId } = require('../../../config.json');
-const { logger } = require('../../utils/tools/logger');
+const { logger } = require('../../utils/logger/logger');
 const fs = require('fs');
 
 module.exports = (client) => {

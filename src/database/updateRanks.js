@@ -1,10 +1,18 @@
-const Player = require('../../schemas/player');
-const LeagueAccount = require('../../schemas/league_account');
-const LastRank = require('../../schemas/last_rank');
-const { searchRank } = require('../api/league-v4');
-const { logger } = require('../tools/logger');
+const LeagueAccount = require('./schemas/league_account');
+const LastRank = require('./schemas/last_rank');
+const Player = require('./schemas/player');
+const { searchRank } = require('../api/riot/league-v4');
+const { logger } = require('../utils/logger/logger');
 
-async function updateRanks(guildId) {
+async function updateRanks(client, guildId) {
+
+    // Check if the bot is still in the guild
+    const guild = client.guilds.cache.get(guildId);
+    if (!guild) {
+        // logger.error(`The bot is no longer a member of the guild with ID: ${guildId}`);
+        return;
+    }
+
     // Get all registered users
     const registeredPlayers = await Player.find({ player_fk_guildId: guildId });
 
@@ -23,7 +31,7 @@ async function updateRanks(guildId) {
                 continue;
             }
             if (!rankData) {
-                logger.warning(`No rank data found for ${account.leagueAccount_nameId}`);
+                logger.warning(`No rank data found for ${account.leagueAccount_nameId} while trying to update his rank.`);
                 continue;
             }
 
@@ -35,13 +43,14 @@ async function updateRanks(guildId) {
                 // Initialize or update lastRank entry
                 lastRankEntry = new LastRank({
                     lastRank_fk_leagueAccounts: account._id,
-                    lastRank_soloq: soloQData,
-                    lastRank_flex: flexQData,
-                    lastRank_soloqSecond: soloQData,
+                    lastRank_account:account.leagueAccount_nameId,
+                    lastRank_soloqPrevious: soloQData,
+                    lastRank_flexPrevious: flexQData,
+                    lastRank_soloqCurrent: soloQData,
                     lastRank_soloqDaily: soloQData,
                     lastRank_soloqWeekly: soloQData,
                     lastRank_soloqMonthly: soloQData,
-                    lastRank_flexSecond: flexQData,
+                    lastRank_flexCurrent: flexQData,
                     lastRank_flexDaily: flexQData,
                     lastRank_flexWeekly: flexQData,
                     lastRank_flexMonthly: flexQData,
@@ -73,15 +82,15 @@ async function updateRanks(guildId) {
 }
 
 async function updateLastRank(lastRankEntry, currentRank, queueType) {
-    const lastRank = queueType === 'soloq' ? lastRankEntry.lastRank_soloq : lastRankEntry.lastRank_flex;
+    const lastRank = queueType === 'soloq' ? lastRankEntry.lastRank_soloqCurrent : lastRankEntry.lastRank_flexCurrent;
     if (lastRank && compareRanks(lastRank, currentRank)) return; // No change in rank
-
+    
     if (queueType === 'soloq') {
-        lastRankEntry.lastRank_soloq = { ...lastRankEntry.lastRank_soloqSecond };
-        lastRankEntry.lastRank_soloqSecond = currentRank;
+    lastRankEntry.lastRank_soloqPrevious = { ...lastRankEntry.lastRank_soloqCurrent };
+    lastRankEntry.lastRank_soloqCurrent = currentRank;
     } else if (queueType === 'flex') {
-        lastRankEntry.lastRank_flex = { ...lastRankEntry.lastRank_flexSecond };
-        lastRankEntry.lastRank_flexSecond = currentRank;
+        lastRankEntry.lastRank_flexPrevious = { ...lastRankEntry.lastRank_flexCurrent };
+        lastRankEntry.lastRank_flexCurrent = currentRank;
     }
 }
 
@@ -96,8 +105,8 @@ async function rankVariation(accountId) {
 
     if (!lastRankEntry) return { soloQVariation: '', flexQVariation: '' };;
 
-    const soloQVariation = calculateVariation(lastRankEntry.lastRank_soloqSecond, lastRankEntry.lastRank_soloq);
-    const flexQVariation = calculateVariation(lastRankEntry.lastRank_flexSecond, lastRankEntry.lastRank_flex);
+    const soloQVariation = calculateVariation(lastRankEntry.lastRank_soloqCurrent, lastRankEntry.lastRank_soloqPrevious);
+    const flexQVariation = calculateVariation(lastRankEntry.lastRank_flexCurrent, lastRankEntry.lastRank_flexPrevious);
 
     return { soloQVariation, flexQVariation };
 }
@@ -124,7 +133,7 @@ const rankOrder = {
 };
 
 function calculateVariation(currentRank, lastRank) {
-    if (!lastRank || !currentRank) return '| (? / Solo/Duo)';
+    if (!lastRank || !currentRank) return ''; // | (? / Solo/Duo)
 
     let variationMessage = '';
 
@@ -150,7 +159,7 @@ function calculateVariation(currentRank, lastRank) {
         } else if (lpDifference < 0) {
             variationMessage = `| (<:redtriangle:1267052146650513420> ${lpDifference} / Solo/Duo)`;
         } else {
-            variationMessage = '| (? / Solo/Duo)';
+            variationMessage = ''; // | (? / Solo/Duo)
         }
     }
 

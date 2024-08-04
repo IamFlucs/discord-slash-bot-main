@@ -1,7 +1,7 @@
 const fs = require('fs');
 const connectDB = require('./src/events/client/readyDB.js');
 const { token } = require('./config.json');
-const { logger } = require('./src/utils/tools/logger.js');
+const { logger } = require('./src/utils/logger/logger.js');
 const { EmbedBuilder, GatewayIntentBits, Client, Collection, Events, /*, ChannelType, ActionRowBuilder, ButtonBuilder, ButtonStyle, AttachmentBuilder, codeBlock*/ } = require('discord.js');
 const client = new Client({ intents: [
     GatewayIntentBits.Guilds,

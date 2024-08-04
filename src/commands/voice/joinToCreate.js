@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ChannelType, PermissionFlagsBits } = require('discord.js');
-const { logger } = require('../../utils/tools/logger');
-const guildSchema = require('../../schemas/guild');
-const voiceSchema = require('../../schemas/jointocreate');
+const { logger } = require('../../utils/logger/logger');
+const guildSchema = require('../../database/schemas/guild');
+const voiceSchema = require('../../database/schemas/jointocreate');
 
 /**
  * This command enable a specific voice channel to be a temporary voice channels creator.

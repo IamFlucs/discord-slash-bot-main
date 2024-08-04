@@ -1,27 +1,20 @@
 const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../tools/logger.js');
+const { logger } = require('../../utils/logger/logger');
 
 /**
  * Search for a summoner by game name, region, and tag.
- * @param {string} puuid - The universal unique id.
- * @param {string} subRegion - The region of the summoner.
+ * @param {string} gameName - The game name of the summoner.
+ * @param {string} region - The region of the summoner.
+ * @param {string} tag - The tag of the summoner.
  * @returns {Promise<Object>} - A promise that resolves to the summoner data.
  */
-async function searchSummoner(puuid, subRegion) {
-    const riotURL = `.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
-    const fetchSummoner = `https://${subRegion}${riotURL}${puuid}?api_key=${riotApiKey}`;
+async function searchAccount(gameName, region, tag) {
+    const riotURL = `.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tag}`;
+    const fetchAccount = `https://${region}${riotURL}?api_key=${riotApiKey}`;
 
     try {
-        const response = await axios.get(fetchSummoner);
-        // /* DEBUG */ logger.log('API response:', JSON.stringify(response.data, null, 2));
-
-        // // Handle errors > à supprimer ?
-        // if (response.data.status) {
-        //     // Check for errors in the status object
-        //     const { status_code, message } = response.data.status;
-        //     throw new Error(`${status_code}: ${message}`);
-        // }
+        const response = await axios.get(fetchAccount);
         return response.data;
     } catch (error) {
         // /* DEBUG */ logger.log('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
@@ -81,4 +74,9 @@ async function searchSummoner(puuid, subRegion) {
     }
 }
 
-module.exports = { searchSummoner };
+// {
+//     "puuid": "0Z6K4rkBJZJNFbQXnPHfs4fRsjVyRiIjpwo_...",
+//     "gameName": "Mr Flucs",
+//     "tagLine": "EUW"
+// }
+module.exports = { searchAccount };
