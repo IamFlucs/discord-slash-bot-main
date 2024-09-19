@@ -1,6 +1,23 @@
+# Credentials
 config.json
-/node_modules
-node_modules/.bin/nodemon
-node_modules/.bin/nodetouch
-node_modules/.bin/nopt
-node_modules/.bin/semver
+
+# Logs
+logs
+*.log
+
+# Modules
+node_modules
+*.local
+
+# Editor directories and files
+.vscode
+.debug
+.env
+.prettierrc
+.DS_Store
+.idea
+.dis
+
+# lockfile
+package-lock.json
+nodemon.json
