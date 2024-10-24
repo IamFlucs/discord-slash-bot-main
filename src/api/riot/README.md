@@ -1,11 +1,14 @@
 # Obtain your RIOT API Key
 Sign in to your [Riot Developer Account](https://https://developer.riotgames.com/apis#) and in the **Dashboard** section, you should see your **Development [API Key](https://developer.riotgames.com)**:
-![alt](https://apipheny.io/wp-content/uploads/2020/04/1-6-1024x604.jpg "Register your project")
+![dashboard](https://github.com/user-attachments/assets/65b34ca2-cddb-4fc9-9e8e-899597f9d20a)
 
 > [!NOTE]
 > The Riot API key expires after 24 hours. If it’s been more than 24 hours since you last got your key, you must log in again and generate a new key by clicking the REGENERATE API KEY button.
 
 To obtain a much durable key, register your project as **personal app**.
+![Register](https://github.com/user-attachments/assets/addd720b-97f2-4f9c-b26f-91eafdb01421)
+![Key](https://github.com/user-attachments/assets/6c29c383-43f6-44ff-9394-f07fb7c46c51)
+
 ## Personal App
 Register your project to apply for a Personal API Key without the verification process. This is only for the Standard API’s, not Tournaments. Personal Keys require a detailed description of the project.
 
@@ -14,7 +17,7 @@ The Riot API accepts your API key via headers. This is the cleaner method to aut
 ```sh
 // config.json
 
-"X-Riot-Token": "RGAPI-b529Ax3f-3Y13-4A9d-a9Y2-10Ab9ecc8494"`
+"X-Riot-Token": "RGAPI-b5x9Ax3f-3x13-4A9x-x9Y2-10AX9eXx8494"`
 ```
 
 ## Example Usage of Riot API
@@ -41,6 +44,10 @@ We get a response as follows:
 ```
 
 We will be using the `encryptedSummonerId` **puuid** response.
+
+> [!IMPORTANT]  
+> You cannot use puuids obtained with one key with a second key. 
+> Puuids are unique for each token.
 
 Now that we have our PUUID we will pass it to League-V4's by-summoner endpoint.
 

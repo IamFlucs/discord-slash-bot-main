@@ -1,8 +1,11 @@
 const { SlashCommandBuilder, PermissionsBitField  } = require('discord.js');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const Player = require('../../database/schemas/player');
 const LeagueAccount = require('../../database/schemas/league_account');
 const LastRank = require('../../database/schemas/last_rank');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 /**
  * Perms: @everyone
@@ -62,7 +65,7 @@ module.exports = {
                 ephemeral: false
             });
         } catch (error) {
-            // /* DEBUG */ logger.error('Error removing game accounts:', error);
+            logger.error('Error removing game accounts:', error);
             await interaction.reply({
                 content: 'Failed to remove game accounts.',
                 ephemeral: true

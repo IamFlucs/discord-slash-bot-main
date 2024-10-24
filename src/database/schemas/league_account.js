@@ -6,18 +6,6 @@ const leagueAccountSchema = new Schema({
         ref: 'Player',
         required: true,
     },
-    leagueAccount_fk_gameCard: { 
-        type: Schema.Types.ObjectId, 
-        ref: 'GameCard' 
-    },
-    leagueAccount_fk_currentGame: { 
-        type: Schema.Types.ObjectId, 
-        ref: 'CurrentGame' 
-    },
-    leagueAccount_fk_rank: {
-        type: Schema.Types.ObjectId,
-        ref: 'Rank'
-    },
     leagueAccount_name: String,
     leagueAccount_nameId: String,
     leagueAccount_summonerId: String,

@@ -1,7 +1,11 @@
-const { logger } = require('../../utils/logger/logger.js')
+const { createLogger } = require('../../utils/logger/logger.js')
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 module.exports = {
 	name: 'interactionCreate',
+    
 	async execute(interaction, client) {
 		if (interaction.isChatInputCommand()) {
             const { commands } = client;

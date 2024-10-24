@@ -13,16 +13,15 @@ Follow these steps to set up your Application on your Discord server.
 3. Enter your Bot's name.
 4. On the page you are directed to, set the icon (image) of the Bot.
 5. Click "`Bot`" on the left side of the screen.
-6. Click "`Add Bot`".
-7. Enable all three Intents (Remember to save your changes!).
-8. Click "`reset token`".
-9. Copy the token that is displayed – You will need this later.
+6. Enable all three Intents (Remember to save your changes!).
+7. Click "`reset token`".
+8. Copy the token that is displayed – You will need this later.
 
 ### Adding the Bot to your server
 
-1. Click "`oauth2`" then “URL Generator" on the left side of the screen.
-2. Click "`application.commands`" and "`bot`" from the first grid.
-3. Click "`administrator`" from the second grid.
+1. Click "`oauth2`" then on “OAuth2 URL Generator".
+2. Check "`application.commands`" and "`bot`" from the first grid.
+3. Check "`administrator`" from the second grid.
 4. Copy the URL below the grids into a browser, and follow the steps
 on screen.
 

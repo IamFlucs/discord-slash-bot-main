@@ -1,7 +1,10 @@
 const { SlashCommandBuilder, PermissionsBitField, PermissionFlagsBits } = require('discord.js');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const InfoChannel = require('../../database/schemas/info_channel');
 const InfoPanel = require('../../database/schemas/info_panel_message');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 /**
  * Perms: @administrator.
@@ -29,18 +32,25 @@ module.exports = {
             }
 
             // Delete the database
-            await InfoPanel.deleteMany({ infoPanel_fk_infoChannel: infoChannel._id });
+            await InfoPanel.deleteOne({ infoPanel_fk_infoChannel: infoChannel._id });
             await InfoChannel.deleteOne({ infoChannel_channelId: channelId });
+
+            logger.phase('> Deleting database info channel & panel');
 
             // Delete the discord channel
             await interaction.channel.delete();
 
-            await interaction.reply({ 
-                content: `Info channel deleted successfully.`, 
-                ephemeral: true 
-            });
+            logger.phase('> Then deleting channel');
+
+            // await interaction.reply({ 
+            //     content: `Info channel deleted successfully.`, 
+            //     ephemeral: true 
+            // });
+            
         } catch (error) {
-            logger.error('Error deleting info channel:', error);
+            logger.error('Error deleting info channel:', {
+                message: error.message,
+            });
             await interaction.reply({ 
                 content: `Failed to delete the info channel.`, 
                 ephemeral: true 

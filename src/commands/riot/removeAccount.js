@@ -1,9 +1,12 @@
 const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
 const { searchAccount } = require('../../api/riot/account-v1');
+const { createLogger } = require('../../utils/logger/logger');
 const Player = require('../../database/schemas/player');
 const LeagueAccount = require('../../database/schemas/league_account');
 const LastRank = require('../../database/schemas/last_rank');
-const { logger } = require('../../utils/logger/logger');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 /**
  * Perms: @everyone.

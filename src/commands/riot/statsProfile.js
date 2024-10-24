@@ -2,10 +2,13 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 // const { searchAccount } = require('../../api/riot/account-v1');
 const { searchSummoner } = require('../../api/riot/summoner-v4');
 const { searchRank } = require('../../api/riot/league-v4');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const Player = require('../../database/schemas/player');
 const LeagueAccount = require('../../database/schemas/league_account');
 const { tierDict, tierEmojiDict, rankDict } = require('../../utils/api/riotMessageUtil');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 /**
  * Perms: this command is for @everyone

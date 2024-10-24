@@ -1,7 +1,10 @@
 const { REST, Routes } = require('discord.js');
 const { token, clientId } = require('../../../config.json');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const fs = require('fs');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 module.exports = (client) => {
     client.handleCommands = async () => {

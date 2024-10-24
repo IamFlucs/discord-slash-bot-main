@@ -6,24 +6,24 @@
  */
 function comparePlayersByRank(a, b) {
     const tierOrder = {
-        'Unranked': 0,
-        'IRON': 1,
-        'BRONZE': 2,
-        'SILVER': 3,
-        'GOLD': 4,
-        'PLATINUM': 5,
-        'EMERALD': 6,
-        'DIAMOND': 7,
-        'MASTER': 8,
-        'GRANDMASTER': 9,
-        'CHALLENGER': 10
+        'Unranked': 1,
+        'IRON': 2,
+        'BRONZE': 3,
+        'SILVER': 4,
+        'GOLD': 5,
+        'PLATINUM': 6,
+        'EMERALD': 7,
+        'DIAMOND': 8,
+        'MASTER': 9,
+        'GRANDMASTER': 10,
+        'CHALLENGER': 11
     };
 
     const rankOrder = {
-        'IV': 0,
-        'III': 1,
-        'II': 2,
-        'I': 3
+        'IV': 1,
+        'III': 2,
+        'II': 3,
+        'I': 4
     };
 
     if (tierOrder[a.tier] !== tierOrder[b.tier]) {

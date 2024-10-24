@@ -1,6 +1,6 @@
-const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
+const axios = require('axios');
 
 /**
  * Search for a summoner by game name, region, and tag.
@@ -10,6 +10,9 @@ const { logger } = require('../../utils/logger/logger');
  * @returns {Promise<Object>} - A promise that resolves to the summoner data.
  */
 async function searchAccount(gameName, region, tag) {
+    const debugLog = false;
+    const logger = createLogger(debugLog);
+
     const riotURL = `.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tag}`;
     const fetchAccount = `https://${region}${riotURL}?api_key=${riotApiKey}`;
 
@@ -17,11 +20,11 @@ async function searchAccount(gameName, region, tag) {
         const response = await axios.get(fetchAccount);
         return response.data;
     } catch (error) {
-        // /* DEBUG */ logger.log('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
+        logger.info('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
 
         if (error.response) {
             if (error.response && error.response.data.status) {
-                // The request was made and the server responded with a status object
+                // Request was made and the server responded with a status object
                 const { status_code, message } = error.response.data.status;
                 let errorMessage;
     
@@ -36,7 +39,7 @@ async function searchAccount(gameName, region, tag) {
                         errorMessage = 'Forbidden. Access is denied.';
                         break;
                     case 404:
-                        errorMessage = 'Summoner not found. Please check the game name and tag.';
+                        errorMessage = 'Summoner not found 2. Please check the game name and tag.';
                         break;
                     case 405:
                         errorMessage = 'Method not allowed.';
@@ -64,7 +67,7 @@ async function searchAccount(gameName, region, tag) {
                 }
                 throw new Error(errorMessage);
             } else if (error.request) {
-                // The request was made but no response was received
+                // Request was made but no response was received
                 throw new Error('No response received from the server.');
             } else {
                 // Something happened in setting up the request that triggered an Error
@@ -74,9 +77,12 @@ async function searchAccount(gameName, region, tag) {
     }
 }
 
+module.exports = { searchAccount };
+
+// Example
 // {
 //     "puuid": "0Z6K4rkBJZJNFbQXnPHfs4fRsjVyRiIjpwo_...",
-//     "gameName": "Mr Flucs",
+//     "gameName": "IamFlucs",
 //     "tagLine": "EUW"
 // }
-module.exports = { searchAccount };
+// Warning: when changing API key all puuid change

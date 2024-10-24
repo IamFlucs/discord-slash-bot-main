@@ -1,5 +1,5 @@
-const { SlashCommandBuilder, PermissionFlagsBits, PermissionsBitField } = require('discord.js');
-const { logger } = require('../../utils/logger/logger');
+const { SlashCommandBuilder, PermissionsBitField, PermissionFlagsBits } = require('discord.js');
+const { createLogger } = require('../../utils/logger/logger');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -33,7 +33,11 @@ module.exports = {
                     { name: 'Invisible', value: 'invisible' },
                 )
                 .setRequired(true)),
+
     async execute(interaction) {
+        const debugLog = true;
+        const logger = createLogger(debugLog);
+
         // Checks if user has administrator permission level
         if (!interaction.member.permissions.has(PermissionsBitField.Flags.Administrator)) {
             logger.warning(`User ${interaction.user.username} do not have admin permission to use /set-status command.`);
@@ -49,10 +53,11 @@ module.exports = {
                 activities: [{ name: activity, type: type-1, url: `https://www.twitch.tv/flucss` }], 
                 status: status 
             });
-            logger.phase('>> Updating bot status...');
+            logger.phase('>> Bot status update <<');
             logger.info(` > New activity : ${activity}`);
             logger.info(` > New status : ${status}`);
             await interaction.reply({ content: 'Bot status updated successfully.', ephemeral: true });
+
         } catch (error) {
             logger.error('Error updating bot status:', error);
             await interaction.reply({ content: 'There was an error updating bot status.', ephemeral: true });

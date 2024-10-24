@@ -1,30 +1,27 @@
-const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
+const axios = require('axios');
 
 /**
  * Search for a summoner by game name, region, and tag.
  * @param {string} puuid - The universal unique id.
  * @param {string} subRegion - The region of the summoner.
- * @returns {Promise<Object>} - A promise that resolves to the summoner data.
+ * @returns {Promise<Object>} - Get a summoner by PUUID.
  */
 async function searchSummoner(puuid, subRegion) {
+    const debugLog = false;
+    const logger = createLogger(debugLog);
+
     const riotURL = `.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/`;
     const fetchSummoner = `https://${subRegion}${riotURL}${puuid}?api_key=${riotApiKey}`;
 
     try {
         const response = await axios.get(fetchSummoner);
-        // /* DEBUG */ logger.log('API response:', JSON.stringify(response.data, null, 2));
-
-        // // Handle errors > à supprimer ?
-        // if (response.data.status) {
-        //     // Check for errors in the status object
-        //     const { status_code, message } = response.data.status;
-        //     throw new Error(`${status_code}: ${message}`);
-        // }
+        logger.info('API response:', JSON.stringify(response.data, null, 2));
         return response.data;
+
     } catch (error) {
-        // /* DEBUG */ logger.log('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
+        logger.info('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
 
         if (error.response) {
             if (error.response && error.response.data.status) {
@@ -43,7 +40,7 @@ async function searchSummoner(puuid, subRegion) {
                         errorMessage = 'Forbidden. Access is denied.';
                         break;
                     case 404:
-                        errorMessage = 'Summoner not found. Please check the game name and tag.';
+                        errorMessage = 'Summoner not found 6. Please check the game name and tag.';
                         break;
                     case 405:
                         errorMessage = 'Method not allowed.';
@@ -82,3 +79,14 @@ async function searchSummoner(puuid, subRegion) {
 }
 
 module.exports = { searchSummoner };
+
+// Example
+// {
+//     "id": "1j0miQbViwN0QKI90IMF_NN_...",
+//     "accountId": "rFWCfZUr1XMzH4mQs...",
+//     "puuid": "0Z6K4rkBJZJNFbQXnPHfs4fRsjV...",
+//     "profileIconId": 6526,
+//     "revisionDate": 1724261567341,
+//     "summonerLevel": 366
+// }
+// Warning: when changing API key all PUUID change

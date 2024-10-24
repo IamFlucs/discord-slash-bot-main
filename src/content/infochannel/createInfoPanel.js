@@ -1,12 +1,17 @@
-const { tierDict, tierEmojiDict, gameTypeDict, rankDict } = require('../../utils/api/riotMessageUtil');
+const { tierDict, tierOrder, tierEmojiDict, gameTypeDict, rankDict } = require('../../utils/api/riotMessageUtil');
 const { comparePlayersByRank } = require('../../utils/player/comparePlayers');
 const { searchCurrentGame } = require('../../api/riot/spectator-v5');
 const { getTimeDifference } = require ('../../utils/date/timestamp');
 const { rankVariation } = require('../../database/updateRanks');
 const { searchRank } = require('../../api/riot/league-v4');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const Player = require('../../database/schemas/player');
 const LeagueAccount = require('../../database/schemas/league_account');
+const InfoChannel = require('../../database/schemas/info_channel');
+const CurrentGame = require('../../database/schemas/current_game');
+
+const debugLog = false;
+const logger = createLogger(debugLog);
 
 /**
  * This function retrieves the IDs of guild members, checks whether they are registered in the database
@@ -22,7 +27,26 @@ async function createInfoPanel(guildId, timestamp) {
     const playersInGame = [];
     const playersNotInGame = [];
 
-    // Get all registered users
+    const fetchInfoChannel = await InfoChannel.findOne({ infoChannel_fk_guild: guildId });
+
+    // Empty activeGames
+    fetchInfoChannel.infoChannel_activeGames = [];
+    await fetchInfoChannel.save();
+
+    // if (fetchInfoChannel.infoChannel_activeGames.length === 0) {
+    //     logger.ok('infoChannel_activeGames is empty.');
+    // } else {
+    //     logger.ko(`infoChannel_activeGames is not empty: ${fetchInfoChannel.infoChannel_activeGames}`);
+    // }
+
+    if (!fetchInfoChannel) {
+        logger.warning('createInfoPanel.js /!\\ Failed to find the info channel entry.');
+        // We don't log this case because all guild that don't have infoChannel will pop an Error.
+        // TODO: create a boolean in guild.js to quickly filter which guild has an infoChannel.
+        return;
+    }
+
+    // Get all registered players of the server
     const registeredPlayers = await Player.find({ player_fk_guildId: guildId });
 
     // Processing registered players
@@ -36,6 +60,8 @@ async function createInfoPanel(guildId, timestamp) {
             const currentGame = await searchCurrentGame(account.leagueAccount_puuid, account.leagueAccount_server);
             const rankData = await searchRank(account.leagueAccount_summonerId, account.leagueAccount_server);
 
+            const fetchCurrentGame = await CurrentGame.findOne({ currentGame_fk_leagueAccount: account._id });
+            
             let soloQtier = "Unranked";
             let soloQrank = "";
             let soloQlp = 0;
@@ -69,6 +95,50 @@ async function createInfoPanel(guildId, timestamp) {
                     message: `<@${player.player_discordId}> : ${gameTypeDict[currentGame.gameQueueConfigId]} with account **${account.leagueAccount_nameId}** (${getTimeDifference(Math.floor((currentGame.gameStartTime + currentGame.gameLength) / 1000))})\n`
                 });
                 inGameFound = true;
+
+                // Check if this account have a currentGame stored in the database
+                if (fetchCurrentGame) {
+                    // logger.debug(`${fetchCurrentGame.currentGame_id}, type: ${typeof fetchCurrentGame.currentGame_id}`);
+                    // logger.debug(`${currentGame.gameId}, type: ${typeof currentGame.gameId}`);
+                    if (fetchCurrentGame.currentGame_id === String(currentGame.gameId)) {
+                        logger.ok(`${account.leagueAccount_nameId} still in the same game.`);
+
+                    } else {
+                        // logger.info(`${account.leagueAccount_nameId} find a new game. We are going to delete his old game and create a new one.`);
+                        /*const deletedResult =*/ await CurrentGame.deleteMany({ currentGame_fk_leagueAccount: account._id });
+                        // Test to find out if the database was correctly delete before recreation
+                        // if (deletedResult.deletedCount > 0) {
+                        //     logger.ok(`Successfully deleted ${deletedResult.deletedCount} game(s) for account ${account.leagueAccount_nameId}.`);
+                        // } else {
+                        //     logger.ko(`Failed to delete games for account ${account.leagueAccount_nameId}. Database still has existing records.`);
+                        // }
+
+                        const newGame = new CurrentGame({
+                            currentGame_fk_leagueAccount: account._id,
+                            currentGame_id: currentGame.gameId, 
+                            currentGame_data: currentGame, 
+                            currentGame_server: account.leagueAccount_server, 
+                        });
+                        await newGame.save();
+                    }
+                } else if (!fetchCurrentGame) {
+                    // logger.ok(`${account.leagueAccount_nameId} has no data, we are going to create it.`);
+                    const newGame = new CurrentGame({
+                        currentGame_fk_leagueAccount: account._id,
+                        currentGame_id: currentGame.gameId, 
+                        currentGame_data: currentGame, 
+                        currentGame_server: account.leagueAccount_server,
+                    });
+                    await newGame.save();
+                } else {
+                    logger.ko(`You are in the wrong place buddy.`);
+                }
+                // Save the id of the game
+                await InfoChannel.updateOne(
+                    { _id: fetchInfoChannel._id },
+                    { $push: { infoChannel_activeGames: currentGame.gameId } }
+                );
+
                 break;
             } else {
                 // Player not in game
@@ -79,10 +149,28 @@ async function createInfoPanel(guildId, timestamp) {
                     rank: soloQrank,
                     lp: soloQlp
                 });
+
+                // Delete old currentGame entries
+                if (fetchCurrentGame) {
+                    logger.info(`Found an old entry for ${account.leagueAccount_nameId} who is not in game. Deleting...`);
+
+                    const result = await CurrentGame.deleteOne({ _id: fetchCurrentGame._id });
+
+                    if (result.deletedCount > 0) {
+                        logger.ok(`Successfully deleted currentGame entry for ${account.leagueAccount_nameId}.`);
+                    } else {
+                        logger.ko(`Failed to delete currentGame entry for ${account.leagueAccount_nameId}.`);
+                    }
+                } else {
+                    // logger.info(`No currentGame entry found for ${account.leagueAccount_nameId}, nothing to delete.`);
+                    continue;
+                }
             }
         }
-
+        
+        // Analyze players not in game
         if (!inGameFound) {
+            // Player with 1 account
             if (playerAccounts.length === 1) {
                 const account = notInGameAccounts[0];
                 playersNotInGame.push({
@@ -92,9 +180,10 @@ async function createInfoPanel(guildId, timestamp) {
                     lp: account.lp
                 });
             } else {
+                // Players with multiple accounts
                 notInGameAccounts.sort(comparePlayersByRank);
 
-                // For players with multiple accounts, compile rank information
+                // Compile rank information
                 let message = `<@${player.player_discordId}> : Currently not in game | Account list:\n`;
                 for (const account of notInGameAccounts) {
                     message += account.rankStats === "Unranked" 
@@ -102,15 +191,17 @@ async function createInfoPanel(guildId, timestamp) {
                         : `- ${account.accountName} : Rank | ${account.rankStats}\n`;                
                 }
                 
+                // Find best account (best rank)
                 const highestRankAccount = notInGameAccounts.reduce((prev, current) => {
-                    if (tierDict[prev.tier] !== tierDict[current.tier]) {
-                        return (tierDict[prev.tier] > tierDict[current.tier]) ? prev : current;
+                    if (tierOrder[prev.tier] !== tierOrder[current.tier]) {
+                        return (tierOrder[prev.tier] > tierOrder[current.tier]) ? prev : current;
                     }
                     if (rankDict[prev.rank] !== rankDict[current.rank]) {
                         return (rankDict[prev.rank] > rankDict[current.rank]) ? prev : current;
                     }
                     return (prev.lp > current.lp) ? prev : current;
                 });
+                
                 playersNotInGame.push({
                     message: message,
                     tier: highestRankAccount.tier,

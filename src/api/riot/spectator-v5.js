@@ -1,21 +1,25 @@
-const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
+const axios = require('axios');
 
 /**
  * Search for a summoner by game name, region, and tag.
  * @param {string} puuid - The universal unique id.
  * @param {string} subRegion - The region of the summoner.
- * @returns {Promise<Object>} - A promise that resolves to the summoner data.
+ * @returns {Promise<Object>} - Get current game information for the given puuid.
  */
 async function searchCurrentGame(puuid, subRegion) {
+    const debugLog = false;
+    const logger = createLogger(debugLog);
+
     const riotURL = `.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/`;
     const fetchSummoner = `https://${subRegion}${riotURL}${puuid}?api_key=${riotApiKey}`;
 
     try {
         const response = await axios.get(fetchSummoner);
+        logger.info('API response:', JSON.stringify(response.data, null, 2));
+        
         return response.data;
-
     } catch (error) {
         if (error.response) {
             if (error.response.status === 404){
@@ -63,7 +67,7 @@ async function searchCurrentGame(puuid, subRegion) {
             }
             throw new Error(errorMessage);
         } else if (error.request) {
-            // The request was made but no response was received
+            // Request was made but no response was received
             throw new Error('No response received from the server.');
         } else {
             // Something happened in setting up the request that triggered an Error
@@ -71,6 +75,5 @@ async function searchCurrentGame(puuid, subRegion) {
         }
     }
 }
-
 
 module.exports = { searchCurrentGame };
