@@ -5,8 +5,15 @@ const info_channelSchema = new Schema({
         type: String,
         ref: 'Guild'
     },
-    infoChannel_channelId: String
-    // No 'infoChannel_channelName' cause the name can be modified after creation
+    infoChannel_channelId: String,
+    infoChannel_gameCardOption: {
+        type: Boolean,
+        default: false
+    },
+    infoChannel_activeGames: [{
+        type: String,
+        default: []
+    }],
 });
 
 module.exports = model('InfoChannel', info_channelSchema);

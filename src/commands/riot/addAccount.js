@@ -1,9 +1,12 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
 const { searchAccount } = require('../../api/riot/account-v1');
 const { searchSummoner } = require('../../api/riot/summoner-v4');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const Player = require('../../database/schemas/player');
 const LeagueAccount = require('../../database/schemas/league_account');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 /** 
  * Perms: @everyone.
@@ -26,21 +29,21 @@ module.exports = {
                 .addChoices(
                     { name: 'EUW', value: JSON.stringify({ region: 'europe', subRegion: 'euw1' }) },
                     { name: 'EUNE', value: JSON.stringify({ region: 'europe', subRegion: 'eun1' }) },
+                    { name: 'ME', value: JSON.stringify({ region: 'europe', subRegion: 'me1' }) },
+                    { name: 'TR', value: JSON.stringify({ region: 'europe', subRegion: 'tr1' }) },
+                    { name: 'RU', value: JSON.stringify({ region: 'europe', subRegion: 'ru1' }) },
+                    { name: 'NA', value: JSON.stringify({ region: 'americas', subRegion: 'na1' }) },
                     { name: 'BR', value: JSON.stringify({ region: 'americas', subRegion: 'br1' }) },
-                    { name: 'JP', value: JSON.stringify({ region: 'asia', subRegion: 'jp1' }) },
-                    { name: 'KR', value: JSON.stringify({ region: 'asia', subRegion: 'kr' }) },
                     { name: 'LAN', value: JSON.stringify({ region: 'americas', subRegion: 'la1' }) },
                     { name: 'LAS', value: JSON.stringify({ region: 'americas', subRegion: 'la2' }) },
-                    { name: 'NA', value: JSON.stringify({ region: 'americas', subRegion: 'na1' }) },
-                    { name: 'OCE', value: JSON.stringify({ region: 'asia', subRegion: 'oc1' }) },
-                    { name: 'TR', value: JSON.stringify({ region: 'asia', subRegion: 'tr1' }) },
-                    { name: 'RU', value: JSON.stringify({ region: 'asia', subRegion: 'ru1' }) },
-                    { name: 'SG', value: JSON.stringify({ region: 'asia', subRegion: 'sg2' }) },
-                    { name: 'PH', value: JSON.stringify({ region: 'asia', subRegion: 'ph2' }) },
-                    { name: 'VN', value: JSON.stringify({ region: 'asia', subRegion: 'vn2' }) },
-                    { name: 'TH', value: JSON.stringify({ region: 'asia', subRegion: 'th2' }) },
-                    { name: 'TW', value: JSON.stringify({ region: 'asia', subRegion: 'tw2' }) },
-                    { name: 'ME', value: JSON.stringify({ region: 'europe', subRegion: 'me1' }) },
+                    { name: 'KR', value: JSON.stringify({ region: 'asia', subRegion: 'kr' }) },
+                    { name: 'JP', value: JSON.stringify({ region: 'asia', subRegion: 'jp1' }) },
+                    { name: 'OCE', value: JSON.stringify({ region: 'sea', subRegion: 'oc1' }) },
+                    { name: 'PH', value: JSON.stringify({ region: 'sea', subRegion: 'ph2' }) },
+                    { name: 'SG', value: JSON.stringify({ region: 'sea', subRegion: 'sg2' }) },
+                    { name: 'TH', value: JSON.stringify({ region: 'sea', subRegion: 'th2' }) },
+                    { name: 'TW', value: JSON.stringify({ region: 'sea', subRegion: 'tw2' }) },
+                    { name: 'VN', value: JSON.stringify({ region: 'sea', subRegion: 'vn2' }) },
                 )
         )
         .addStringOption(option => option

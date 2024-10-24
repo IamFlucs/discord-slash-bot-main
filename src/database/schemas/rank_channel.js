@@ -6,8 +6,10 @@ const rank_channelSchema = new Schema({
         ref: 'Guild'
     },
     rankChannel_channelId: String,
-    rankChannel_messageId: String
+    rankChannel_updateDaily: String,
+    rankChannel_updateWeekly: String,
+    rankChannel_updateMonthly: String
     // No 'rankChannel_channelName' cause the name can be modified after creation
 });
 
-module.exports = model('InfoChannel', rank_channelSchema);
+module.exports = model('RankChannel', rank_channelSchema);

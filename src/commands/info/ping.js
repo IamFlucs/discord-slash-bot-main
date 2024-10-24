@@ -11,6 +11,7 @@ module.exports = {
             .setTitle('Calculating Bot Ping...')
         // await interaction.deferReply({ ephemeral: true });
         await interaction.reply({ embeds: [embed], ephemeral: true });
+
         const apiPing = interaction.client.ws.ping || 'undefined';
         const botLatency = Date.now() - interaction.createdTimestamp;
         const FinalEmbed = new EmbedBuilder()

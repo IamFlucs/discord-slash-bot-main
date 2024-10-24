@@ -1,8 +1,15 @@
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const guildSchema = require('../../database/schemas/guild');
 
+const debugLog = true;
+const logger = createLogger(debugLog);
+
+/**
+ * This event push a new entry when the bot join a new guild.
+ */
 module.exports = {
 	name: 'guildCreate',
+
 	async execute(guild) {
         logger.info(`Bot added the a new guild: ${guild.name} (ID: ${guild.id}).`);
         try {

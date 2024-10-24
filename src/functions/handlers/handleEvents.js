@@ -1,5 +1,8 @@
 const fs = require('fs');
-const { logger } = require('../../utils/logger/logger.js');
+const { createLogger } = require('../../utils/logger/logger.js');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 module.exports = (client) => {
     client.handleEvents = async () => {

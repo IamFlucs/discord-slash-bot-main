@@ -1,24 +1,27 @@
-const axios = require('axios');
 const { riotApiKey } = require('../../../config.json');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
+const axios = require('axios');
 
 /**
- * Search for a summoner by game name, region, and tag.
+ * Search all league entries (rank) for a summoner.
  * @param {string} summonerId - The summonerData.id.
  * @param {string} subRegion - The region of the summoner.
- * @returns {Promise<Object>} - A promise that resolves to the summoner data.
+ * @returns {Promise<Object>} - Get league entries in all queues for a given summoner ID.
  */
 async function searchRank(summonerId, subRegion) {
+    const debugLog = false;
+    const logger = createLogger(debugLog);
+
     const riotURL = `.api.riotgames.com/lol/league/v4/entries/by-summoner/`;
     const fetchSummoner = `https://${subRegion}${riotURL}${summonerId}?api_key=${riotApiKey}`;
 
     try {
         const response = await axios.get(fetchSummoner);
-        // /* DEBUG */ logger.log('API response:', JSON.stringify(response.data, null, 2));
+        logger.info('API response:', JSON.stringify(response.data, null, 2));
         return response.data;
 
     } catch (error) {
-        // /* DEBUG */ logger.log('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
+        logger.info('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
 
         if (error.response) {
             if (error.response && error.response.data.status) {
@@ -37,7 +40,7 @@ async function searchRank(summonerId, subRegion) {
                         errorMessage = 'Forbidden. Access is denied.';
                         break;
                     case 404:
-                        errorMessage = 'Summoner not found. Please check the game name and tag.';
+                        errorMessage = 'Summoner not found 4. Please check the game name and tag.';
                         break;
                     case 405:
                         errorMessage = 'Method not allowed.';
@@ -76,3 +79,47 @@ async function searchRank(summonerId, subRegion) {
 }
 
 module.exports = { searchRank };
+
+// Example
+// [
+//     {
+//       "leagueId": "5ce62f3e-8c28-45c9-93d9...",
+//       "queueType": "RANKED_FLEX_SR",
+//       "tier": "EMERALD",
+//       "rank": "I",
+//       "summonerId": "1j0miQbViwN0QKI90IMF_NN_...",
+//       "leaguePoints": 15,
+//       "wins": 5,
+//       "losses": 2,
+//       "veteran": false,
+//       "inactive": false,
+//       "freshBlood": false,
+//       "hotStreak": true
+//     },
+//     {
+//       "queueType": "CHERRY",
+//       "summonerId": "1j0miQbViwN0QKI90IMF_NN_...",
+//       "leaguePoints": 0,
+//       "wins": 19,
+//       "losses": 24,
+//       "veteran": false,
+//       "inactive": false,
+//       "freshBlood": false,
+//       "hotStreak": false
+//     },
+//     {
+//       "leagueId": "311eb19b-eefd-4c59-9bc8-...",
+//       "queueType": "RANKED_SOLO_5x5",
+//       "tier": "PLATINUM",
+//       "rank": "I",
+//       "summonerId": "1j0miQbViwN0QKI90IMF_NN_...",
+//       "leaguePoints": 78,
+//       "wins": 13,
+//       "losses": 12,
+//       "veteran": false,
+//       "inactive": false,
+//       "freshBlood": false,
+//       "hotStreak": false
+//     }
+//   ]
+// Warning: when changing API key all encryptedSummonerId change

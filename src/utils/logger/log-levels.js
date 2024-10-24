@@ -1,4 +1,3 @@
-// levels.js
 module.exports.LogLevels = {
     FATAL: 'FATAL',
     CRITICAL: 'CRITK',

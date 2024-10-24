@@ -1,6 +1,6 @@
 const { REST, Routes, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
 const { clientId, guildId, token } = require('../../../config.json');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -9,6 +9,9 @@ const commandsFolderPath = path.join(__dirname, '../commands');
 const commands = [];
 
 console.clear();
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 // BROWSE SLASH COMMANDS
 function loadCommandsFromDirectory(directory) {

@@ -1,9 +1,11 @@
-const { GatewayIntentBits } = require('discord.js');
 const { createInfoPanel } = require('./createInfoPanel');
 const { createTimestamp } = require('../../utils/date/timestamp');
-const { logger } = require('../../utils/logger/logger');
+const { createLogger } = require('../../utils/logger/logger');
 const InfoChannel = require('../../database/schemas/info_channel');
 const InfoPanel = require('../../database/schemas/info_panel_message');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 /**
  * Update the info panel message.
@@ -17,14 +19,14 @@ async function updateInfoPanel(client, guildId) {
         // Check if the bot is still in the guild
         const guild = client.guilds.cache.get(guildId);
         if (!guild) {
-            // logger.error(`The bot is no longer a member of the guild with ID: ${guildId}`);
+            // logger.debug(`The bot is no longer a member of the guild with ID: ${guildId}`);
             return;
         }
 
         // Find the info Channel
         const searchedInfoChannel = await InfoChannel.findOne({ infoChannel_fk_guild: guildId });
         if (!searchedInfoChannel) {
-            // logger.spam('Failed to find the info channel entry.');
+            // logger.debug('Failed to find the info channel entry.');
             // We don't log this case because all guild that don't have infoChannel will pop an Error.
             // TODO: create a boolean in guild.js to quickly filter which guild has an infoChannel.
             return;
@@ -57,7 +59,7 @@ async function updateInfoPanel(client, guildId) {
 
         // Check if the message author is the bot
         if (message.author.id !== client.user.id) {
-            // logger.warning('The message was not authored by the bot. Skipping update.');
+            // logger.debug('The message was not authored by the bot. Skipping update.');
             return;
         }
 
@@ -71,7 +73,7 @@ async function updateInfoPanel(client, guildId) {
 
     } catch (error) {
         logger.warning('/!\\ updateInfoPanel.js');
-        logger.error(`Error refreshing info panel: ${error.message}`);
+        logger.error(`Refreshing info panel: ${error.message}`);
         logger.error(error); 
     }
 }

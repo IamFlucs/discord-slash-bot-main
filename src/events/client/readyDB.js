@@ -1,5 +1,8 @@
 const mongoose = require('mongoose');
-const { logger } = require('../../utils/logger/logger.js');
+const { createLogger } = require('../../utils/logger/logger.js');
+
+const debugLog = true;
+const logger = createLogger(debugLog);
 
 /**
  * This event handle the connection with the MangoDB using mongoose

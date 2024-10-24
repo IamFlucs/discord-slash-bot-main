@@ -1,9 +1,19 @@
 const LeagueAccount = require('./schemas/league_account');
 const LastRank = require('./schemas/last_rank');
 const Player = require('./schemas/player');
+const { tierOrder, rankOrder } = require('../utils/api/riotMessageUtil');
 const { searchRank } = require('../api/riot/league-v4');
-const { logger } = require('../utils/logger/logger');
+const { createLogger } = require('../utils/logger/logger');
 
+const debugLog = true;
+const logger = createLogger(debugLog);
+
+/**
+ * Get the current & previous rank updated for every registered players.
+ * @param {*} client 
+ * @param {*} guildId 
+ * @returns 
+ */
 async function updateRanks(client, guildId) {
 
     // Check if the bot is still in the guild
@@ -13,7 +23,7 @@ async function updateRanks(client, guildId) {
         return;
     }
 
-    // Get all registered users
+    // Get all registered players of the guild
     const registeredPlayers = await Player.find({ player_fk_guildId: guildId });
 
     // Processing registered players
@@ -36,9 +46,10 @@ async function updateRanks(client, guildId) {
             }
 
             let lastRankEntry = await LastRank.findOne({ lastRank_fk_leagueAccounts: account._id });
-
+            
             const soloQData = rankData.find(data => data.queueType === 'RANKED_SOLO_5x5') || null;
             const flexQData = rankData.find(data => data.queueType === 'RANKED_FLEX_SR') || null;
+
             if (!lastRankEntry) {
                 // Initialize or update lastRank entry
                 lastRankEntry = new LastRank({
@@ -56,6 +67,7 @@ async function updateRanks(client, guildId) {
                     lastRank_flexMonthly: flexQData,
                 });
                 await lastRankEntry.save();
+
             } else {
                 // Update database soloQ and flex
                 try {
@@ -69,18 +81,23 @@ async function updateRanks(client, guildId) {
                     if (flexQData) {
                         await updateLastRank(lastRankEntry, flexQData, 'flex');
                     }
-
                     await lastRankEntry.save();
+
                 } catch (error) {
                     logger.error(`Error saving lastRankEntry for ${account.leagueAccount_nameId}: ${error}`);
                 }
             }
-
-            
         }
     }
 }
 
+/**
+ * Update the new rank and stock previous rank.
+ * @param {*} lastRankEntry - database entry
+ * @param {*} currentRank - fetched current rank
+ * @param {string} queueType 
+ * @returns 
+ */
 async function updateLastRank(lastRankEntry, currentRank, queueType) {
     const lastRank = queueType === 'soloq' ? lastRankEntry.lastRank_soloqCurrent : lastRankEntry.lastRank_flexCurrent;
     if (lastRank && compareRanks(lastRank, currentRank)) return; // No change in rank
@@ -94,12 +111,23 @@ async function updateLastRank(lastRankEntry, currentRank, queueType) {
     }
 }
 
+/**
+ * Check if entries are both the same in rank.
+ * @param {*} lastRank - database entry
+ * @param {*} currentRank - fetched current rank
+ * @returns {boolean}
+ */
 function compareRanks(lastRank, currentRank) {
     return lastRank.tier === currentRank.tier &&
            lastRank.rank === currentRank.rank &&
            lastRank.leaguePoints === currentRank.leaguePoints;
 }
 
+/**
+ * Get a custom message of the LP variation for a given player.
+ * @param {string} accountId - Riot accound Id.
+ * @returns {message} for InfoPanel.
+ */
 async function rankVariation(accountId) {
     const lastRankEntry = await LastRank.findOne({ lastRank_fk_leagueAccounts: accountId });
 
@@ -111,27 +139,12 @@ async function rankVariation(accountId) {
     return { soloQVariation, flexQVariation };
 }
 
-const tierOrder = {
-    'Unranked': 0,
-    'IRON': 1,
-    'BRONZE': 2,
-    'SILVER': 3,
-    'GOLD': 4,
-    'PLATINUM': 5,
-    'EMERALD': 6,
-    'DIAMOND': 7,
-    'MASTER': 8,
-    'GRANDMASTER': 9,
-    'CHALLENGER': 10
-};
-
-const rankOrder = {
-    'IV': 0,
-    'III': 1,
-    'II': 2,
-    'I': 3
-};
-
+/**
+ * Get a custom message of the LP variation of the latest game. Used in infochannel.
+ * @param {*} currentRank - fetched current rank
+ * @param {*} lastRank - database entry
+ * @returns {message} for InfoPanel.
+ */
 function calculateVariation(currentRank, lastRank) {
     if (!lastRank || !currentRank) return ''; // | (? / Solo/Duo)
 
@@ -140,24 +153,24 @@ function calculateVariation(currentRank, lastRank) {
     // Compare tiers
     if (tierOrder[currentRank.tier] !== tierOrder[lastRank.tier]) {
         if (tierOrder[currentRank.tier] > tierOrder[lastRank.tier]) {
-            variationMessage = '| (<:greentriangle:1267052111753904139> Rank Up / Solo/Duo)';
+            variationMessage = '| (<:greentriangle:1280627014507827250> Rank Up / Solo/Duo)'; // 1267052111753904139
         } else {
-            variationMessage = '| (<:redtriangle:1267052146650513420> Rank Lost / Solo/Duo)';
+            variationMessage = '| (<:redtriangle:1280627038188732534> Rank Lost / Solo/Duo)'; // EzBot 1267052146650513420
         }
     } else if (rankOrder[currentRank.rank] !== rankOrder[lastRank.rank]) {
         // Compare ranks if tiers are the same
         if (rankOrder[currentRank.rank] > rankOrder[lastRank.rank]) {
-            variationMessage = '| (<:greentriangle:1267052111753904139> Division Up / Solo/Duo)';
+            variationMessage = '| (<:greentriangle:1280627014507827250> Division Up / Solo/Duo)';
         } else {
-            variationMessage = '| (<:redtriangle:1267052146650513420> Division Lost / Solo/Duo)';
+            variationMessage = '| (<:redtriangle:1280627038188732534> Division Lost / Solo/Duo)';
         }
     } else {
         // Compare LP if tiers and ranks are the same
         const lpDifference = currentRank.leaguePoints - lastRank.leaguePoints;
         if (lpDifference > 0) {
-            variationMessage = `| (<:greentriangle:1267052111753904139> +${lpDifference} / Solo/Duo)`;
+            variationMessage = `| (<:greentriangle:1280627014507827250> +${lpDifference} / Solo/Duo)`;
         } else if (lpDifference < 0) {
-            variationMessage = `| (<:redtriangle:1267052146650513420> ${lpDifference} / Solo/Duo)`;
+            variationMessage = `| (<:redtriangle:1280627038188732534> ${lpDifference} / Solo/Duo)`;
         } else {
             variationMessage = ''; // | (? / Solo/Duo)
         }

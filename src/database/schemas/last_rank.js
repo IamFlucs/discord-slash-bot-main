@@ -1,10 +1,10 @@
 const { Schema, model } = require('mongoose');
 
 const lastRankSchema = new Schema({
-    lastRank_fk_leagueAccounts: [{ 
+    lastRank_fk_leagueAccounts: { 
         type: Schema.Types.ObjectId, 
         ref: 'LeagueAccount' 
-    }],
+    },
     lastRank_account: String,
     lastRank_soloqPrevious: { type: Schema.Types.Mixed },
     lastRank_flexPrevious: { type: Schema.Types.Mixed },
