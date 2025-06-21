@@ -59,9 +59,9 @@ EzBot is a Discord bot designed to provide detailed information about League of 
 
 <details>
     <summary><b>⭐ Information Panel</b></summary>
-    <p>League of Legends feature where EzBot sends an infopanel with information about all the registered players.</p>
-    <p>Ideally the information channel does not allow sending messages to users other than the bot.</p>
-    <img src="https://github.com/user-attachments/assets/1c546f20-0ba6-464c-9bdc-b0d5d7017ae2" alt="Outer JPG" width="750">
+    <p>League of Legends feature where EzBot sends an infopanel with information about all the registered players.<br>
+    Ideally the information channel does not allow sending messages to users other than the bot.</p>
+    <img src="https://github.com/user-attachments/assets/17dda7bb-1abb-42ba-a487-586933759963" alt="Outer JPG" width="787">
     <p>&nbsp</p>
     <details>
         <summary>Create an infochannel</summary>
@@ -79,14 +79,14 @@ EzBot is a Discord bot designed to provide detailed information about League of 
 
 <details>
     <summary><b>🃏 Game Card option</b></summary>
-    <p>Optional feature of the ⭐ Information Panel where information cards about current games are sent under the information panel.</p>
-    <p>The cards are only displayed during the game and are deleted once game is finished.</p>
-    <img src="https://github.com/user-attachments/assets/1c546f20-0ba6-464c-9bdc-b0d5d7017ae2" alt="Outer JPG" width="750">
+    <p>Optional feature of the <code>⭐ Information Panel</code> where information cards about current games are sent under the information panel.<br>
+    The cards are only displayed during the game and are deleted once game is finished.</p>
+    <img src="https://github.com/user-attachments/assets/37408511-405f-4251-9e89-100bb2b00f19" alt="Outer JPG" width="436">
     <p>&nbsp</p>
     <details>
         <summary>Toggle game card option</summary>
-        <p>Use <code>/toggle-gamecard</code> to toggle the option for game card feature.</p>
-        <img src="https://github.com/user-attachments/assets/638f86ab-04ad-4371-b4cf-a31f9c6582cb" alt="Inner GIF 1" width="650">
+        <p>Use <code>/toggle-gamecard</code> inside the Information Channel to toggle the option for game card feature.</p>
+        <img src="https://github.com/user-attachments/assets/7698b86a-f247-400f-b5bf-29a632b3c951" alt="Inner GIF 1" width="503">
         <p>&nbsp</p>
     </details>
     <p>&nbsp</p>
@@ -95,18 +95,44 @@ EzBot is a Discord bot designed to provide detailed information about League of 
 <details>
     <summary><b>📈 Rank Update</b></summary>
     <p>League of Legends feature where EzBot sends daily, weekly and monthly rank updates about all the registered players.</p>
-    <img src="https://github.com/user-attachments/assets/1c546f20-0ba6-464c-9bdc-b0d5d7017ae2" alt="Outer JPG" width="750">
+    <img src="https://github.com/user-attachments/assets/7132e5ae-9085-4cbb-af74-36ffbfefe370" alt="Outer JPG" width="534">
     <p>&nbsp</p>
     <details>
         <summary>Create a rank update channel</summary>
         <p>Use <code>/create-rankchannel</code> to create a new rankchannel where EzBot can send the rank update embeds.</p>
-        <img src="https://github.com/user-attachments/assets/638f86ab-04ad-4371-b4cf-a31f9c6582cb" alt="Inner GIF 1" width="650">
+        <img src="https://github.com/user-attachments/assets/911d8939-f931-49a5-b476-6aec20abf9d3" alt="Inner GIF 1" width="499">
         <p>&nbsp</p>
     </details>
     <details>
         <summary>Delete a rank update channel</summary>
-        <p>Use <code>/delete-rankchannel</code> to delete the rankchannel.</p>
-        <img src="https://github.com/user-attachments/assets/7cd25c8c-7510-4081-a832-62517af1aec4" alt="Inner GIF 2" width="650">
+        <p>Use <code>/delete-rankchannel</code> inside the rank channel to delete it.</p>
+        <img src="https://github.com/user-attachments/assets/7b9e2239-ade7-4743-8d71-82caf03bc630" alt="Inner GIF 2" width="440">
+    </details>
+    <p>&nbsp</p>
+</details>
+
+<details>
+    <summary><b>🪙 Weekly sale</b></summary>
+    <p>League of Legends feature that monitors Twitter for League of Legends Weekly Sales.<br>
+    Automatically posts updates in a specified channel.</p>
+    <img src="https://github.com/user-attachments/assets/31c84669-41ec-4556-bf41-534138df6f8b" alt="Outer JPG" width="499">
+    <p>&nbsp</p>
+    <details>
+        <summary>Setup a weekly sale channel</summary>
+        <p>Use <code>/weekly-sale setup</code> to enable a weekly sale channel.</p>
+        <img src="https://github.com/user-attachments/assets/22a94d08-1a4a-496d-aabf-52e80d327996" alt="Inner GIF 1" width="650">
+        <p>&nbsp</p>
+    </details>
+    <details>
+        <summary>Disable a weekly sale channel</summary>
+        <p>Use <code>/weekly-sale disable</code> to disable a weekly sale channel.</p>
+        <img src="https://github.com/user-attachments/assets/a6d0ec9a-2fbc-4be4-aa2b-b69dd0c1ade8" alt="Inner GIF 2" width="650">
+        <p>&nbsp</p>
+    </details>
+    <details>
+        <summary>List all weekly sale channels</summary>
+        <p>Use <code>/weekly-sale list</code> to show all weekly sale channels.</p>
+        <img src="https://github.com/user-attachments/assets/1ee059b5-64c9-40d7-942b-6cd62bf5b2a5" alt="Inner GIF 3" width="650">
     </details>
     <p>&nbsp</p>
 </details>
@@ -144,7 +170,8 @@ npm install
     "token": "your-discord-bot-token",
     "clientId": "your-bot-id",
     "riotApiKey": "your-riot-api-key",
-    "mongodbUrl": "your-mongodb-uri"
+    "mongodbUrl": "your-mongodb-uri",
+    "xBearerToken": "your-x-api-key"
 }
 ```
 4. Start the bot:

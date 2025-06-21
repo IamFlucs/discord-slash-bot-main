@@ -21,3 +21,6 @@ node_modules
 # lockfile
 package-lock.json
 nodemon.json
+
+# Specific test files
+src/commands/admin/twitter.js

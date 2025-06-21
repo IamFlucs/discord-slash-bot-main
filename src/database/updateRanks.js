@@ -153,7 +153,7 @@ function calculateVariation(currentRank, lastRank) {
     // Compare tiers
     if (tierOrder[currentRank.tier] !== tierOrder[lastRank.tier]) {
         if (tierOrder[currentRank.tier] > tierOrder[lastRank.tier]) {
-            variationMessage = '| (<:greentriangle:1280627014507827250> Rank Up / Solo/Duo)'; // 1267052111753904139
+            variationMessage = '| (<:greentriangle:1280627014507827250> Rank Up / Solo/Duo)'; // EzBot 1267052111753904139
         } else {
             variationMessage = '| (<:redtriangle:1280627038188732534> Rank Lost / Solo/Duo)'; // EzBot 1267052146650513420
         }

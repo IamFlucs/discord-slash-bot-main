@@ -35,15 +35,15 @@ client.handleComponents();
 const debugLog = true;
 const logger = createLogger(debugLog);
 
-// Reconnection logic
-const loginWithRetry = async (retries = 5, delay = 5000) => {
+// RECONNECTION RETRY
+const loginWithRetry = async (retries = 10, delay = 5000) => {
     try {
         await client.login(token);
         logger.info('Client logged in successfully.');
     } catch (error) {
         if (retries === 0) {
             logger.error(`Failed to login after multiple attempts: ${error.message}`);
-            process.exit(1);  // Stop the application after exhausting attempts
+            //process.exit(1);  // Stop the application after exhausting attempts
         } else {
             logger.warn(`Login failed, retrying in ${delay / 1000} seconds... Retries left: ${retries}`);
             setTimeout(() => loginWithRetry(retries - 1, delay), delay);  // Réessayer après un délai
@@ -61,12 +61,13 @@ client.on('shardError', (error) => {
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    logger.error('Unhandled promise rejection:', reason);
+    logger.error(`Unhandled promise rejection: ${reason.message || reason}`);
+    logger.debug(`Associated promise: ${JSON.stringify(promise, null, 2)}`)
 });
 
 process.on('uncaughtException', (error) => {
     logger.error('Uncaught exception:', error);
-    process.exit(1);  // Optional: Close the application after an unhandled exception
+    // process.exit(1);  // Optional: Close the application after an unhandled exception
 });
 
 // Start bot with reconnection attempt

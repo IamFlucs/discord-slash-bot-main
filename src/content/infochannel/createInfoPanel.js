@@ -87,7 +87,7 @@ async function createInfoPanel(guildId, timestamp) {
             const translatedSoloQtier = tierDict[soloQtier] || soloQtier;
             const translatedSoloQrank = rankDict[soloQrank] || soloQrank;
             const soloQrankEmoji = tierEmojiDict[soloQtier] || '';
-            const soloQRankedStats = soloQtier === "Unranked" ? "Unranked" : `${soloQrankEmoji} ${translatedSoloQtier} ${translatedSoloQrank} ${soloQlp} LP ${soloQVariation}`;
+            const soloQRankedStats = soloQtier === "Unranked" ? "Unranked" : `${soloQrankEmoji} ${translatedSoloQtier} ${translatedSoloQrank}, ${soloQlp} LP`; /*${soloQVariation}*/
 
             if (currentGame) {
                 // Player in game
