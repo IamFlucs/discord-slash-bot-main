@@ -32,9 +32,9 @@ module.exports = {
             }            
         });
 
-        // Schedule a weekly message every Tuesday at 9:35 AM ('35 9 * * 2').
+        // Schedule a weekly message every Monday at 6:35 AM ('35 6 * * 1').
         // For development, you might use every 2 hours ('0 */2 * * *').
-        cron.schedule('35 9 * * 2', async () => {
+        cron.schedule('35 6 * * 1', async () => {
             try {
                 const guilds = await RankChannel.find({});
 

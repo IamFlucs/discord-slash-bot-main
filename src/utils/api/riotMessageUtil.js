@@ -61,6 +61,7 @@ const gameTypeDict = {
     '440': '5v5 Ranked Flex | <:rift:1261817502284124260> Summoner\'s Rift',
     '450': 'Aram | <:aram:1261817500094435498> Howling Abyss',
     '490': 'Normal (Quickplay) | <:rift:1261817502284124260> Summoner\'s Rift',
+    '900': 'ARURF | <:rift:1261817502284124260> Summoner\'s Rift',
     '1700': 'Arena | <:arena:1261817501314973777>',
     '1710': 'Arena | <:arena:1261817501314973777>',
 }
@@ -153,6 +154,7 @@ const championIconDict = {
     'Akali': '<:Akali:1261656703456247938>',
     'Akshan': '<:Akshan:1261656711094079568>',
     'Alistar': '<:Alistar:1261656718132252693>',
+    'Ambessa': '<:Ambessa:1303830817784594576>',
     'Amumu': '<:Amumu:1261656759945265172>',
     'Anivia': '<:Anivia:1261656776802173008>',
     'Annie': '<:Annie:1261656789980545106>',
@@ -228,6 +230,7 @@ const championIconDict = {
     'Malzahar': '<:Malzahar:1261660275438780477>',
     'Maokai': '<:Maokai:1261660284129640482>',
     'MasterYi': '<:MasterYi:1261660293638000690>',
+    'Mel': '<:Mel:1339283284575785106>',
     'Milio': '<:Milio:1261660510269734912>',
     'MissFortune': '<:MissFortune:1261660618042380351>',
     'Mordekaiser': '<:Mordekaiser:1261660637797417011>',
@@ -476,6 +479,8 @@ const championIdDict = {
     '555': 'Pyke',
     '711': 'Vex',
     '777': 'Yone',
+    '799': 'Ambessa',
+    '800': 'Mel',
     '875': 'Sett',
     '876': 'Lillia',
     '887': 'Gwen',
@@ -531,7 +536,7 @@ const championRoles = {
     '39': { top: 0.52, mid: 0.48 }, // 'Irelia'
     '40': { support: 1.0 }, // 'Janna'
     '41': { top: 0.7, mid: 0.3 }, // 'Gangplank'
-    '42': { mid: 0.95, adc: 0.05 }, // 'Corki'
+    '42': { adc: 0.73, mid: 0.27 }, // 'Corki'
     '43': { support: 0.96, mid: 0.04 }, // 'Karma'
     '44': { support: 1.0 }, // 'Taric'
     '45': { mid: 0.78, adc: 0.12, support: 0.1 }, // 'Veigar'
@@ -569,7 +574,7 @@ const championRoles = {
     '86': { top: 0.86, mid: 0.14 }, // 'Garen'
     '89': { support: 1.0 }, // 'Leona'
     '90': { mid: 1.0 }, // 'Malzahar'
-    '91': { mid: 0.61, jungle: 0.39 }, // 'Talon'
+    '91': { jungle: 0.65, mid: 0.35 }, // 'Talon'
     '92': { top: 1.0 }, // 'Riven'
     '96': { adc: 0.9, mid: 0.1 }, // 'KogMaw'
     '98': { top: 0.82, support: 0.18}, // 'Shen'
@@ -619,9 +624,9 @@ const championRoles = {
     '223': { top: 0.62, support: 0.38 }, // 'TahmKench'
     '233': { jungle: 1.0 }, // 'Briar'
     '234': { jungle: 1.0 }, // 'Viego'
-    '235': { support: 0.99, adc: 0.01 }, // 'Senna'
+    '235': { adc: 0.69, support: 0.31 }, // 'Senna'
     '236': { adc: 0.86, mid: 0.14 }, // 'Lucian'
-    '238': { mid: 0.83, jungle: 0.17 }, // 'Zed'
+    '238': { mid: 0.5, jungle: 0.5 }, // 'Zed'
     '240': { top: 1.0 }, // 'Kled'
     '245': { jungle: 0.61, mid: 0.39 }, // 'Ekko'
     '246': { mid: 0.79, jungle: 0.21 }, // 'Qiyana'
@@ -647,6 +652,8 @@ const championRoles = {
     '555': { support: 0.97, mid: 0.03 }, // 'Pyke'
     '711': { mid: 1.0 }, // 'Vex'
     '777': { mid: 0.61, top: 0.39 }, // 'Yone'
+    '799': { top: 0.88, mid: 0.12 }, // 'Ambessa'
+    '800': { mid: 0.63, support: 0.22, adc: 0.15 }, // 'Mel'
     '875': { top: 0.95, mid: 0.05 }, // 'Sett'
     '876': { jungle: 1.0 }, // 'Lillia'
     '887': { top: 0.64, jungle: 0.36 }, // 'Gwen'
@@ -654,7 +661,7 @@ const championRoles = {
     '893': { mid: 0.65, top: 0.35 }, // 'Aurora'
     '895': { adc: 1.0 }, // 'Nilah'
     '897': { top: 1.0 }, // 'KSante'
-    '901': { adc: 0.52, mid: 0.32, top: 0.16 }, // 'Smolder'
+    '901': { adc: 0.9, mid: 0.1 }, // 'Smolder'
     '902': { support: 1.0 }, // 'Milio'
     '910': { mid: 0.79, support: 0.13, adc: 0.08 }, // 'Hwei'
     '950': { mid: 0.83, jungle: 0.09, top: 0.08 }, // 'Naafiri'
