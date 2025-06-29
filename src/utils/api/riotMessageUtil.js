@@ -55,13 +55,15 @@ const rankOrder = {
 };
 
 const gameTypeDict = {
-    '400': '5v5 Normal Draft | <:rift:1261817502284124260> Summoner\'s Rift',
-    '420': '5v5 Ranked Solo/duo | <:rift:1261817502284124260> Summoner\'s Rift',
-    '430': '5v5 Normal Blind | <:rift:1261817502284124260> Summoner\'s Rift',
-    '440': '5v5 Ranked Flex | <:rift:1261817502284124260> Summoner\'s Rift',
-    '450': 'Aram | <:aram:1261817500094435498> Howling Abyss',
-    '490': 'Normal (Quickplay) | <:rift:1261817502284124260> Summoner\'s Rift',
-    '900': 'ARURF | <:rift:1261817502284124260> Summoner\'s Rift',
+    '313': 'Brawl | <:rift:1261817502284124260>',
+    '400': '5v5 Normal Draft | <:rift:1261817502284124260>',
+    '420': '5v5 Ranked Solo/duo | <:rift:1261817502284124260>',
+    '430': '5v5 Normal Blind | <:rift:1261817502284124260>',
+    '440': '5v5 Ranked Flex | <:rift:1261817502284124260>',
+    '450': 'Aram | <:aram:1261817500094435498>',
+    '490': 'Normal (Quickplay) | <:rift:1261817502284124260>',
+    '900': 'ARURF | <:rift:1261817502284124260>',
+    '1400': 'Ultimate Spellbook | <:rift:1261817502284124260>',
     '1700': 'Arena | <:arena:1261817501314973777>',
     '1710': 'Arena | <:arena:1261817501314973777>',
 }

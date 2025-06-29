@@ -21,6 +21,8 @@ const logger = createLogger(debugLog);
  * @returns {string} - The contents of the information panel.
  */
 async function createInfoPanel(guildId, timestamp) {
+    logger.info('');
+    logger.info(`[createInfoPanel] Called with guildId=${guildId}, timestamp=${timestamp}`);
     // Initialization
     let content = "__**Information Panel ⭐**__\n\n";
     
@@ -33,23 +35,15 @@ async function createInfoPanel(guildId, timestamp) {
     fetchInfoChannel.infoChannel_activeGames = [];
     await fetchInfoChannel.save();
 
-    // if (fetchInfoChannel.infoChannel_activeGames.length === 0) {
-    //     logger.ok('infoChannel_activeGames is empty.');
-    // } else {
-    //     logger.ko(`infoChannel_activeGames is not empty: ${fetchInfoChannel.infoChannel_activeGames}`);
-    // }
-
     if (!fetchInfoChannel) {
-        logger.warning('createInfoPanel.js /!\\ Failed to find the info channel entry.');
+        // logger.warning('[createInfoPanel] Failed to find the info channel entry.');
         // We don't log this case because all guild that don't have infoChannel will pop an Error.
         // TODO: create a boolean in guild.js to quickly filter which guild has an infoChannel.
         return;
     }
 
-    // Get all registered players of the server
+    // Get all registered players of the server and processing them
     const registeredPlayers = await Player.find({ player_fk_guildId: guildId });
-
-    // Processing registered players
     for (const player of registeredPlayers) {
         const playerAccounts = await LeagueAccount.find({ _id: { $in: player.player_fk_leagueAccounts } });
         let inGameFound = false;
@@ -58,7 +52,7 @@ async function createInfoPanel(guildId, timestamp) {
         // Processing player accounts
         for (const account of playerAccounts) {
             const currentGame = await searchCurrentGame(account.leagueAccount_puuid, account.leagueAccount_server);
-            const rankData = await searchRank(account.leagueAccount_summonerId, account.leagueAccount_server);
+            const rankData = await searchRank(account.leagueAccount_puuid, account.leagueAccount_server);
 
             const fetchCurrentGame = await CurrentGame.findOne({ currentGame_fk_leagueAccount: account._id });
             
@@ -80,8 +74,7 @@ async function createInfoPanel(guildId, timestamp) {
                     }
                 }
             } catch (error) { 
-                logger.warning(`/!\\ createInfoPanel.js - part 1`);
-                logger.error(`Error while fetching Solo/Duo. Why? ${error}`);
+                logger.error(`[createInfoPanel] Error while fetching Solo/Duo. Why? ${error}`);
             }
 
             const translatedSoloQtier = tierDict[soloQtier] || soloQtier;
@@ -98,8 +91,8 @@ async function createInfoPanel(guildId, timestamp) {
 
                 // Check if this account have a currentGame stored in the database
                 if (fetchCurrentGame) {
-                    // logger.debug(`${fetchCurrentGame.currentGame_id}, type: ${typeof fetchCurrentGame.currentGame_id}`);
-                    // logger.debug(`${currentGame.gameId}, type: ${typeof currentGame.gameId}`);
+                    // logger.debug(`[createInfoPanel] ${fetchCurrentGame.currentGame_id}, type: ${typeof fetchCurrentGame.currentGame_id}`);
+                    // logger.debug(`[createInfoPanel] ${currentGame.gameId}, type: ${typeof currentGame.gameId}`);
                     if (fetchCurrentGame.currentGame_id === String(currentGame.gameId)) {
                         logger.ok(`${account.leagueAccount_nameId} still in the same game.`);
 
@@ -108,9 +101,9 @@ async function createInfoPanel(guildId, timestamp) {
                         /*const deletedResult =*/ await CurrentGame.deleteMany({ currentGame_fk_leagueAccount: account._id });
                         // Test to find out if the database was correctly delete before recreation
                         // if (deletedResult.deletedCount > 0) {
-                        //     logger.ok(`Successfully deleted ${deletedResult.deletedCount} game(s) for account ${account.leagueAccount_nameId}.`);
+                        //     logger.ok(`[createInfoPanel] Successfully deleted ${deletedResult.deletedCount} game(s) for account ${account.leagueAccount_nameId}.`);
                         // } else {
-                        //     logger.ko(`Failed to delete games for account ${account.leagueAccount_nameId}. Database still has existing records.`);
+                        //     logger.ko(`[createInfoPanel] Failed to delete games for account ${account.leagueAccount_nameId}. Database still has existing records.`);
                         // }
 
                         const newGame = new CurrentGame({
@@ -122,7 +115,7 @@ async function createInfoPanel(guildId, timestamp) {
                         await newGame.save();
                     }
                 } else if (!fetchCurrentGame) {
-                    // logger.ok(`${account.leagueAccount_nameId} has no data, we are going to create it.`);
+                    // logger.ok(`[createInfoPanel] ${account.leagueAccount_nameId} is in a new game - Creation of the gamecard entry.`);
                     const newGame = new CurrentGame({
                         currentGame_fk_leagueAccount: account._id,
                         currentGame_id: currentGame.gameId, 
@@ -131,7 +124,7 @@ async function createInfoPanel(guildId, timestamp) {
                     });
                     await newGame.save();
                 } else {
-                    logger.ko(`You are in the wrong place buddy.`);
+                    logger.ko(`[createInfoPanel] You are in the wrong place buddy.`);
                 }
                 // Save the id of the game
                 await InfoChannel.updateOne(
@@ -152,17 +145,17 @@ async function createInfoPanel(guildId, timestamp) {
 
                 // Delete old currentGame entries
                 if (fetchCurrentGame) {
-                    logger.info(`Found an old entry for ${account.leagueAccount_nameId} who is not in game. Deleting...`);
+                    logger.info(`[createInfoPanel] Existing currentGame entry found for ${account.leagueAccount_nameId} (not in game). Attempting to delete...`);
 
                     const result = await CurrentGame.deleteOne({ _id: fetchCurrentGame._id });
 
                     if (result.deletedCount > 0) {
-                        logger.ok(`Successfully deleted currentGame entry for ${account.leagueAccount_nameId}.`);
+                        logger.ok(`[createInfoPanel] Successfully deleted currentGame entry for ${account.leagueAccount_nameId}.`);
                     } else {
-                        logger.ko(`Failed to delete currentGame entry for ${account.leagueAccount_nameId}.`);
+                        logger.ko(`[createInfoPanel] Failed to delete currentGame entry for ${account.leagueAccount_nameId}.`);
                     }
                 } else {
-                    // logger.info(`No currentGame entry found for ${account.leagueAccount_nameId}, nothing to delete.`);
+                    // logger.info(`[createInfoPanel] No currentGame entry found for ${account.leagueAccount_nameId}, skipping deletion.`);
                     continue;
                 }
             }

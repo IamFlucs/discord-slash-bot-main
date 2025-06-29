@@ -21,6 +21,10 @@ module.exports = {
         // Schedule the task to run at a regular interval (e.g., every 20 minutes)
         cron.schedule(`*/20 * * * *`, async () => {
             try {
+                logger.info('');
+                logger.info('********************************************************************');
+                logger.info(`[cronInfoChannel] Starting League of Legends ranking for InfoChannel`);
+                logger.info('********************************************************************');
                 // Fetch all infochannel IDs from the database
                 const guilds = await InfoChannel.find({});
                 for (const guild of guilds) {
@@ -48,7 +52,7 @@ module.exports = {
                     };
                 }
             } catch (error) {
-                logger.warning('Error fetching guilds or updating info panels in the cron job.');
+                logger.error('[cronInfoChannel] Error fetching guilds or updating info panels in the cron job.');
                 logger.error(error);
             }
         });

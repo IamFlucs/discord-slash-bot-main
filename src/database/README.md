@@ -1,6 +1,17 @@
 # Setup MangoDB
 ## Introduction
-MongoDB 4.4 is still required by some software even though it is now deprecated. With Ubuntu 20.04 going into the end of life in the near future, upgrading to the newer version of Ubuntu is becoming important for the security of your server in the future. However, MongoDB 4.4 does not support Ubuntu 22.04 natively. Fortunately, a workaround is possible, allowing you to run MongoDB 4.4 on your server.
+MongoDB 4.4 is still required by some software even though it is now deprecated. 
+With Ubuntu 20.04 going into the end of life in the near future, upgrading to the newer version of Ubuntu is becoming important for the security of your server in the future. <br/>
+However, MongoDB 4.4 does not support Ubuntu 22.04 natively. Fortunately, a workaround is possible, allowing you to run MongoDB 4.4 on your server.
+
+MongoDB 5 and later require AVX to run. You can check if your CPU supports AVX by doing:
+```bash
+    cat /proc/cpuinfo | grep avx
+```
+If you get any kind of output your CPU should support AVX, if not its either too old or if you are running inside a VM and your hypervisor isn't passing through your physical CPU flags. <br/>
+
+That's why we downgraded to MongoDB 4 which still runs without AVX but is end of life.
+
 ## Prerequisites
 Before beginning make sure to have these things completed:
 - Installation of Ubuntu 22.04 server.
@@ -9,11 +20,11 @@ Before beginning make sure to have these things completed:
 
 This can be achieved using:
 ```bash
-    udo apt update`
+    sudo apt update
 ```
 
 ## Linux Installation
-Begin by installing by Libssl 1.1 which is needed by MongoDB without it your will get an error.
+Begin by installing Libssl 1.1 which is needed by MongoDB without it your will get an error.
 
 As there is no install candidate on Ubuntu 22.04, we need to add the package to the package list.
 
@@ -35,6 +46,8 @@ After the installation has completed, remove the package list as it is no longer
 ```
 Now that the dependancy is installed, begin installing MongoDB 4.4.
 
+## 📦 MongoDB installation
+
 First we need add another package list to the package manager in order to download Version 4.4 of MongoDB.
 
 Add the MongoDB key:
@@ -51,6 +64,8 @@ Add the package list:
 ```bash
     echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 ```
+This command registers a new source of APT packages in order to install MongoDB 4.4 on Ubuntu 20.04 (focal).
+
 Update the package manager to incorparate the list:
 ```bash
     sudo apt-get update
@@ -102,17 +117,16 @@ The output should look as follows
 ```
 
 
-
 ## Clean Uninstall 
-Stop MongoDB process:
+1. Stop MongoDB process:
 ```bash
     sudo service mongod stop
 ```
-Completely remove the installed MongoDB packages:
+2. Completely remove the installed MongoDB packages:
 ```bash
     sudo apt-get purge mongodb-org*
 ```
-Remove the data directories, MongoDB database(s), and log files:
+3. Remove the data directories, MongoDB database(s), and log files:
 ```bash
     sudo rm -r /var/log/mongodb /var/lib/mongodb
 ```
@@ -127,7 +141,9 @@ To check if MongoDB is successfully uninstalled, type:
 
 - Also remove the apt-key in Softawres Update.
 
-## Install Mangoose
+## 📦 Mongoose Installation
+Mongoose is a JavaScript library used to interact with a MongoDB database in a more structured and object-oriented way.<br/>
+🔗 [Read the official guide](https://mongoosejs.com/docs/guide.html)
 1. Update npm
 ```bash
     npm install -g npm
@@ -145,11 +161,3 @@ Run the bot and verify that the database connects.
 
 ## Conclusion
 With the successful installation of MongoDB 4.4 on Ubuntu 22.04, your be able to run software that has not updated to the latest version of MongoDB.
-
-MongoDB 5 and later require AVX to run. You can check if your CPU supports AVX by doing:
-```bash
-    cat /proc/cpuinfo | grep avx
-```
-If you get any kind of output your CPU should support AVX, if not its either too old or if you are running inside a VM and your hypervisor isn't passing through your physical CPU flags.
-
-That's why we downgraded to MongoDB 4 which still runs without AVX but is end of life.

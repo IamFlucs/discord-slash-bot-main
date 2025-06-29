@@ -21,7 +21,10 @@ module.exports = {
             .addChannelOption((option) => option
                 .setName('channel')
                 .setDescription('The channel you want post to appear.')
-                .addChannelTypes(ChannelType.GuildText)
+                .addChannelTypes(
+                    ChannelType.GuildText,
+                    ChannelType.GuildAnnouncement
+                )
                 .setRequired(true)
             )
         )
@@ -31,7 +34,10 @@ module.exports = {
             .addChannelOption((option) => option
                 .setName('channel')
                 .setDescription('The channel you want to disable.')
-                .addChannelTypes(ChannelType.GuildText)
+                .addChannelTypes(
+                    ChannelType.GuildText,
+                    ChannelType.GuildAnnouncement
+                )
                 .setRequired(true)
             )
         )

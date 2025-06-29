@@ -10,38 +10,39 @@ const logger = createLogger(debugLog);
 
 /**
  * Get the current & previous rank updated for every registered players.
- * @param {*} client 
- * @param {*} guildId 
+ * @param {*} client - The Discord client.
+ * @param {*} guildId - The ID of the guild.
  * @returns 
  */
 async function updateRanks(client, guildId) {
-
-    // Check if the bot is still in the guild
+    logger.info('');
+    logger.info(`[updateRanks] Called with guildId=${guildId}`);
+    
+    // Ensure the bot is still in the specified guild
     const guild = client.guilds.cache.get(guildId);
     if (!guild) {
-        // logger.error(`The bot is no longer a member of the guild with ID: ${guildId}`);
+        logger.warning(`[updateRanks] The bot is no longer a member of the Discord server (ID=${guildId})`);
+        logger.warning('[updateRanks] Aborting function');
         return;
     }
 
-    // Get all registered players of the guild
+    // Get all registered players of the guild in the database
     const registeredPlayers = await Player.find({ player_fk_guildId: guildId });
-
-    // Processing registered players
     for (const player of registeredPlayers) {
+        
+        // Get all riot accounts for each players in the database (could be one account or more)
         const leagueAccounts = await LeagueAccount.find({ _id: { $in: player.player_fk_leagueAccounts } });
-
-        // Processing player accounts
         for (const account of leagueAccounts) {
             let rankData;
             try {
-                rankData = await searchRank(account.leagueAccount_summonerId, account.leagueAccount_server);
+                rankData = await searchRank(account.leagueAccount_puuid, account.leagueAccount_server);
             } catch (error) {
-                logger.warning(`/!\\ updateRanks.js`);
-                logger.error(`Error fetching rank for ${account.leagueAccount_nameId}: ${error}`);
+                logger.error(`[updateRanks] Exception using league-v4 with summonerId=${account.leagueAccount_nameId}`);
+                logger.error(`${error}`);
                 continue;
             }
-            if (!rankData) {
-                logger.warning(`No rank data found for ${account.leagueAccount_nameId} while trying to update his rank.`);
+            if (!rankData) { 
+                logger.warning(`[updateRanks] No data found with summonerId=${account.leagueAccount_nameId}`);
                 continue;
             }
 
@@ -51,7 +52,8 @@ async function updateRanks(client, guildId) {
             const flexQData = rankData.find(data => data.queueType === 'RANKED_FLEX_SR') || null;
 
             if (!lastRankEntry) {
-                // Initialize or update lastRank entry
+                logger.info(`[updateRanks] First time seeing ${account.leagueAccount_nameId}. Initializing 'last rank' entry in the database.`);
+                // Initialize lastRank entry if it doesn't exist in database
                 lastRankEntry = new LastRank({
                     lastRank_fk_leagueAccounts: account._id,
                     lastRank_account:account.leagueAccount_nameId,
@@ -73,22 +75,22 @@ async function updateRanks(client, guildId) {
                 try {
                     const soloQData = rankData.find(data => data.queueType === 'RANKED_SOLO_5x5');
                     const flexQData = rankData.find(data => data.queueType === 'RANKED_FLEX_SR');
-
                     if (soloQData) {
                         await updateLastRank(lastRankEntry, soloQData, 'soloq');
                     }
-
                     if (flexQData) {
                         await updateLastRank(lastRankEntry, flexQData, 'flex');
                     }
                     await lastRankEntry.save();
 
                 } catch (error) {
-                    logger.error(`Error saving lastRankEntry for ${account.leagueAccount_nameId}: ${error}`);
+                    logger.error(`[updateRanks] Error saving lastRankEntry for ${account.leagueAccount_nameId}`);
+                    logger.error(`${error}`);
                 }
             }
         }
     }
+    logger.info(`[updateRanks] ${registeredPlayers.length} member(s) have been successfully updated.`);
 }
 
 /**
@@ -100,13 +102,20 @@ async function updateRanks(client, guildId) {
  */
 async function updateLastRank(lastRankEntry, currentRank, queueType) {
     const lastRank = queueType === 'soloq' ? lastRankEntry.lastRank_soloqCurrent : lastRankEntry.lastRank_flexCurrent;
-    if (lastRank && compareRanks(lastRank, currentRank)) return; // No change in rank
-    
+    if (lastRank && compareRanks(lastRank, currentRank)) {
+        // logger.info(`[updateLastRank] This account might be unranked or didn't change between latch fetch`);
+        return; // No change in rank
+    }
     if (queueType === 'soloq') {
-    lastRankEntry.lastRank_soloqPrevious = { ...lastRankEntry.lastRank_soloqCurrent };
-    lastRankEntry.lastRank_soloqCurrent = currentRank;
+        // logger.info(`[updateLastRank][Solo] Updating last rank in database`);
+        lastRankEntry.lastRank_soloqPrevious = { ...lastRankEntry.lastRank_soloqCurrent };
+        // logger.info(`[updateLastRank][Solo] Updating new rank in databases`);
+        lastRankEntry.lastRank_soloqCurrent = currentRank;
+        
     } else if (queueType === 'flex') {
+        // logger.info(`[updateLastRank][Flex] Updating last rank in database`);
         lastRankEntry.lastRank_flexPrevious = { ...lastRankEntry.lastRank_flexCurrent };
+        // logger.info(`[updateLastRank][Flex] Updating new rank in databases`);
         lastRankEntry.lastRank_flexCurrent = currentRank;
     }
 }
