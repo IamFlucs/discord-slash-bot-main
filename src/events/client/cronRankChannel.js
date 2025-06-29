@@ -21,13 +21,17 @@ module.exports = {
         // For development, you might use every 30 minutes ('*/30 * * * *').
         cron.schedule('35 7 * * *', async () => {
             try {
+                logger.info('');
+                logger.info('***************************************************************');
+                logger.info(`[cronDailyUpdate] Starting League of Legends Daily Update of LP`);
+                logger.info('***************************************************************');
                 const guilds = await RankChannel.find({});
 
                 for (const guild of guilds) {
                     await handleRankUpdate(client, guild.rankChannel_fk_guild, 'daily');
                 }
             } catch (error) {
-                logger.warning('/!\\ Daily rankUpdateScheduler.js');
+                logger.error('[cronDailyUpdate][Daily] rankUpdateScheduler.js');
                 logger.error(error);
             }            
         });
@@ -36,13 +40,17 @@ module.exports = {
         // For development, you might use every 2 hours ('0 */2 * * *').
         cron.schedule('35 6 * * 1', async () => {
             try {
+                logger.info('');
+                logger.info('****************************************************************');
+                logger.info(`[cronDailyUpdate] Starting League of Legends Weekly Update of LP`);
+                logger.info('****************************************************************');
                 const guilds = await RankChannel.find({});
 
                 for (const guild of guilds) {
                     await handleRankUpdate(client, guild.rankChannel_fk_guild, 'weekly');
                 }
             } catch (error) {
-                logger.warning('/!\\ Weekly rankUpdateScheduler.js');
+                logger.error('[cronDailyUpdate][Weekly] rankUpdateScheduler.js');
                 logger.error(error);
             }  
         });
@@ -51,13 +59,17 @@ module.exports = {
         // For development, you might use daily at 00:30 AM ('30 0 * * *').
         cron.schedule('35 0 1 * *', async () => {
             try {
+                logger.info('');
+                logger.info('*****************************************************************');
+                logger.info(`[cronDailyUpdate] Starting League of Legends Monthly Update of LP`);
+                logger.info('*****************************************************************');
                 const guilds = await RankChannel.find({});
 
                 for (const guild of guilds) {
                     await handleRankUpdate(client, guild.rankChannel_fk_guild, 'monthly');
                 }
             } catch (error) {
-                logger.warning('/!\\ Monthly rankUpdateScheduler.js');
+                logger.error('[cronDailyUpdate][Monthly] rankUpdateScheduler.js');
                 logger.error(error);
             }  
         });

@@ -59,13 +59,13 @@ module.exports = {
             const embeds = [];
 
             for (const account of leagueAccounts) {
-                const playerId = account.leagueAccount_summonerId;
+                // const playerId = account.leagueAccount_summonerId; // summonerId is deprecated since 06-2025
                 const playerPuuid = account.leagueAccount_puuid;
                 const playerRegion = account.leagueAccount_server;
                 
                 // Call Riot API functions
                 const summonerData = await searchSummoner(playerPuuid, playerRegion);
-                const rank = await searchRank(playerId, playerRegion);
+                const rank = await searchRank(playerPuuid, playerRegion);
 
                 // Initialize the data
                 let soloQtier = "Unranked";

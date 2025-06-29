@@ -3,46 +3,51 @@ const { createRankEmbed } = require('./createRankEmbed');
 const { updateRanks } = require('../../database/updateRanks');
 const { createLogger } = require('../../utils/logger/logger');
 const capitalize = require('../../utils/string/capitalize');
-const LastRank = require('../../database/schemas/last_rank');
+// const LastRank = require('../../database/schemas/last_rank');
 const RankChannel = require('../../database/schemas/rank_channel');
 
 const debugLog = true;
 const logger = createLogger(debugLog);
 
 /**
- * Handle rank update and send the periodic rank updates messages
+ * Handles rank updates and sends periodic update messages to the configured rank channel.
  * @param {Client} client - The Discord client.
- * @param {string} guildId - The ID of the guild.
- * @param {string} type - The periodicity (daily, weekly or monthly)
+ * @param {string} guildId - The guild ID.
+ * @param {string} type - The update frequency (daily, weekly, or monthly).
  * @returns 
  */
 async function handleRankUpdate(client, guildId, type) {
     try {
-        // Check if the bot is still in the guild
+        logger.info('');
+        logger.info(`[handleRankUpdate] Called with guildId=${guildId}, type=${type}`);
+        
+        // Ensure the bot is still in the specified guild
         const guild = client.guilds.fetch(guildId);
         if (!guild) {
-            logger.error(`The bot is no longer a member of the guild with ID: ${guildId}`);
+            logger.warning(`[handleRankUpdate] The bot is no longer a member of the Discord server (ID=${guildId})`);
+            logger.warning('[handleRankUpdate] Aborting function');
             return;
         }
 
-        // Check rankChannel existence
+        // Retrieve rank channel configuration
         const searchedRankChannel = await RankChannel.findOne({ rankChannel_fk_guild: guildId });
         if (!searchedRankChannel) {
-            logger.error('Failed to find the info channel entry.');
+            logger.warning('[handleRankUpdate] Failed to find the info channel entry');
+            logger.warning('[handleRankUpdate] Aborting function');
             return;
         }
 
-        // Update current ranks to get the most recent values
+        // Update current rank data
         await updateRanks(client, guildId);
-        logger.info(`updateRanks successfully executed.`);
+        logger.info(`[handleRankUpdate] Rank data successfully updated.`);
 
-        // Prepare embed generation
+        // Prepare timestamps and embed metadata
         const embedColor = getEmbedColor(type);
         const Type = capitalize(type);
         const endTimestamp = Math.floor(Date.now() / 1000); // Current date
         let startTimestamp; // Start of the period
 
-        // Get the last timestamp used from latest update
+        // Determine the starting timestamp based on type
         switch (type) {
             case 'daily':
                 startTimestamp = searchedRankChannel.rankChannel_updateDaily;
@@ -54,28 +59,32 @@ async function handleRankUpdate(client, guildId, type) {
                 startTimestamp = searchedRankChannel.rankChannel_updateMonthly;
                 break;
             default:
-                logger.warning('Invalid periodicity type.')
+                logger.warning('[handleRankUpdate] Invalid update frequency type provided.');
                 return;
         }
 
-        logger.info(`Preparing to start the rankList.`);
+        logger.info(`[handleRankUpdate] Preparing to generate the rank list...`);
 
-        // Get the list of players who played during the period
+        // Generate rank list
         const rankList = await createRankEmbed(client, guildId, type, endTimestamp);
-        if (rankList.length === 0) {
-            logger.info(`No rank updates for guild ${guildId}.`);
+
+        if (!rankList) {
+            logger.warning('[handleRankUpdate] Rank list could not be generated.');
+            logger.warning('[handleRankUpdate] Aborting function');
             return;
-        } else if (!rankList){
-            logger.info(`La rankList n’existe pas.`)
+        } else if (rankList.length === 0) {
+            logger.warning(`[handleRankUpdate] No player activity to report for guild ${guildId}.`);
+            logger.warning('[handleRankUpdate] Aborting function');
+            return;
         } else {
-            logger.ok(`Ranklist successfully executed. Type : ${typeof rankList}.`);
+            logger.info(`[handleRankUpdate] Rank list generated successfully. Type: ${typeof rankList}`);
         }
 
+        // Separate players by gain or loss
         const gainContent = [];
         const lossContent = [];
 
-        // Start filing the lists with the result of 'createRankEmbed'
-        logger.info('Start filing the lists');
+        logger.info('[handleRankUpdate] Categorizing player rank changes...');
         rankList.forEach(entry => {
             if (entry.type === 'gain') {
                 gainContent.push(entry.message);
@@ -84,104 +93,49 @@ async function handleRankUpdate(client, guildId, type) {
             }
         });
 
-
         try {
+            // Build the embed
             const embed = await generateEmbed({
                 Type: type,
-                searchedRankChannel: searchedRankChannel, // Remplacez par vos données
+                searchedRankChannel: searchedRankChannel,
                 startTimestamp: startTimestamp,
-                endTimestamp: endTimestamp, // Exemple de timestamp
-                gainContent: gainContent, // Exemple de données
-                lossContent: lossContent, // Exemple de données
-                embedColor: embedColor // Couleur exemple
+                endTimestamp: endTimestamp,
+                gainContent: gainContent,
+                lossContent: lossContent,
+                embedColor: embedColor
             });
 
-            logger.info(`Going to send the embed for ${type} rank update.`);
+            logger.info(`[handleRankUpdate] Sending ${type} rank update embed...`);
 
-            // Send the message
+            // Send the embed to the channel
             const channel = await client.channels.fetch(searchedRankChannel.rankChannel_channelId)
             if (channel) {
                 await channel.send({ embeds: [embed] });
-                logger.ok(`${Type} rank update sended.`)
+                logger.ok(`[handleRankUpdate] ${Type} rank update successfully sent.`)
             } else {
-                logger.warning(`Cannot send the ${Type} rank update.`)
-                throw new Error(`Channel ${searchedRankChannel.rankChannel_channelId} not found`);
+                logger.warning(`[handleRankUpdate] Unable to send ${Type} rank update - channel not found.`)
+                throw new Error(`[handleRankUpdate] Channel ${searchedRankChannel.rankChannel_channelId} not found`);
             }
     
         } catch (error) {
-            logger.error(`Error in handleRankUpdate: ${error.message}`);
+            logger.error(`[handleRankUpdate] Failed to generate or send embed.`);
+            logger.error(`${error}`);
         }
 
-        // try {
-        //     logger.info('Start generating the embed message.');
-
-        //     // Generate the message
-        //     const embed = new EmbedBuilder()
-        //         .setColor(embedColor)
-        //         .setTitle(`${Type} Rank Update`)
-        //         .setDescription(`Rank changes between <t:${searchedRankChannel[`rankChannel_update${Type}`]}:d> and <t:${endTimestamp}:d>`
-        //         );
-
-        //     // Check if gainContent and lossContent are populated
-        //     logger.debug(`gainContent: ${JSON.stringify(gainContent)}, length: ${gainContent.length}`);
-        //     logger.debug(`lossContent: ${JSON.stringify(lossContent)}, length: ${lossContent.length}`);
-
-        //     // Verify searchedRankChannel and endTimestamp
-        //     logger.debug(`searchedRankChannel: ${JSON.stringify(searchedRankChannel)}`);
-        //     logger.debug(`endTimestamp: ${endTimestamp}`);
-
-        //     // Check if there are no games played
-        //     if (gainContent.length === 0 && lossContent.length === 0) {
-        //         logger.info('No games played. Adding fallback message.');
-        //         embed.addFields({ name: 'No games played', value: 'Maybe another time!', inline: false });
-        //     } else {
-        //         if (gainContent.length > 0) {
-        //             logger.info('Adding successful players to the embed.');
-        //             embed.addFields({ name: 'Most successful players', value: gainContent.join('\n'), inline: false });
-        //         } else {
-        //             logger.info('No successful players to show.');
-        //             embed.addFields({ name: 'Most successful players', value: 'Bad results for everyone. This is a sad day for the server.', inline: false });
-        //         }
-
-        //         if (lossContent.length > 0) {
-        //             logger.info('Adding least successful players to the embed.');
-        //             embed.addFields({ name: 'Least successful players', value: lossContent.join('\n'), inline: false });
-        //         } else {
-        //             logger.info('No rank drops to report.');
-        //             embed.addFields({ name: 'Least successful players', value: 'All victorious: No rank drops in sight! Good job!', inline: false });
-        //         }
-        //     }
-        // } catch (error) {
-        //     logger.error(`Error generating embed message: ${error.message}`);
-        //     logger.debug(error.stack);
-        // }
-        
-        // logger.info(`Going to send the embed for ${type} rank update.`);
-
-        // // Send the message
-        // const channel = await client.channels.fetch(searchedRankChannel.rankChannel_channelId)
-        // if (channel) {
-        //     await channel.send({ embeds: [embed] });
-        //     logger.ok(`${Type} rank update sended.`)
-        // } else {
-        //     logger.warning(`Cannot send the ${Type} rank update.`)
-        //     throw new Error(`Channel ${searchedRankChannel.rankChannel_channelId} not found`);
-        // }
-
-        // Update rankChannel database
+        // Save the updated timestamp in the database
         searchedRankChannel[`rankChannel_update${Type}`] = endTimestamp;
         await searchedRankChannel.save();
 
     } catch (error) {
-        logger.warning(`/!\\ Error in handleRankUpdate for ${type}`);
+        logger.error(`[handleRankUpdate] Unexpected error during ${type} rank update process.`);
         logger.error(error);
     }
 }
 
 /**
- * Get the color of the embed based on the type of update
- * @param {string} type - The type of update (daily, weekly, monthly)
- * @returns {number} - The color code
+ * Returns a color code for the embed based on the update type.
+ * @param {string} type - The update frequency (daily, weekly, monthly).
+ * @returns {number} - Discord embed color code.
  */
 function getEmbedColor(type) {
     switch (type) {
@@ -197,9 +151,8 @@ function getEmbedColor(type) {
 }
 
 /**
- * Generate an embed message summarizing rank changes.
+ * Generates a Discord embed summarizing player rank gains and losses.
  * Handles success and failure messages based on the provided rank data.
- * This function retries the generation in case of temporary errors.
  * @param {Object[]} gainContent - The list of players with LP gains.
  * @param {Object[]} lossContent - The list of players with LP losses.
  * @param {Object} searchedRankChannel - The rank channel configuration.
@@ -209,7 +162,8 @@ function getEmbedColor(type) {
  */
 async function generateEmbed({ Type, searchedRankChannel, startTimestamp, endTimestamp, gainContent, lossContent, embedColor }) {
     try {
-        logger.info('Start generating the embed message.');
+        logger.info('');
+        logger.info(`[generateEmbed] Called with Type=${Type}, startTimestamp=${startTimestamp}, endTimestamp=${endTimestamp}, embedColor=${embedColor}`);
 
         // Create the embed
         const embed = new EmbedBuilder()
@@ -218,37 +172,37 @@ async function generateEmbed({ Type, searchedRankChannel, startTimestamp, endTim
             .setDescription(`Rank changes between <t:${startTimestamp}:d> and <t:${endTimestamp}:d>`);
 
         // Log debug info
-        logger.debug(`gainContent: ${JSON.stringify(gainContent)}, length: ${gainContent.length}`);
-        logger.debug(`lossContent: ${JSON.stringify(lossContent)}, length: ${lossContent.length}`);
-        logger.debug(`searchedRankChannel: ${JSON.stringify(searchedRankChannel)}`);
-        logger.debug(`endTimestamp: ${endTimestamp}`);
+        logger.debug(`[generateEmbed] gainContent: ${JSON.stringify(gainContent)}, length: ${gainContent.length}`);
+        logger.debug(`[generateEmbed] lossContent: ${JSON.stringify(lossContent)}, length: ${lossContent.length}`);
+        logger.debug(`[generateEmbed] searchedRankChannel: ${JSON.stringify(searchedRankChannel)}`);
+        logger.debug(`[generateEmbed] endTimestamp: ${endTimestamp}`);
 
         // Populate the embed
         if (gainContent.length === 0 && lossContent.length === 0) {
-            logger.info('No games played. Adding fallback message.');
+            logger.info('[generateEmbed] No rank activity. Adding fallback message.');
             embed.addFields({ name: 'No games played', value: 'Maybe another time!', inline: false });
         } else {
             if (gainContent.length > 0) {
-                logger.info('Adding successful players to the embed.');
+                logger.info('[generateEmbed] Adding players with rank gains.');
                 embed.addFields({ name: 'Most successful players', value: gainContent.join('\n'), inline: false });
             } else {
-                logger.info('No successful players to show.');
+                logger.info('[generateEmbed] rank gains to report.');
                 embed.addFields({ name: 'Most successful players', value: 'Bad results for everyone. This is a sad day for the server.', inline: false });
             }
 
             if (lossContent.length > 0) {
-                logger.info('Adding least successful players to the embed.');
+                logger.info('[generateEmbed] Adding players with rank losses.');
                 embed.addFields({ name: 'Least successful players', value: lossContent.join('\n'), inline: false });
             } else {
-                logger.info('No rank drops to report.');
+                logger.info('[generateEmbed] No rank losses to report.');
                 embed.addFields({ name: 'Least successful players', value: 'All victorious: No rank drops in sight! Good job!', inline: false });
             }
         }
 
         return embed;
     } catch (error) {
-        logger.error(`Error generating embed message: ${error.message}`);
-        logger.debug(error.stack);
+        logger.error(`[generateEmbed] Failed to generate embed: ${error.message}`);
+        logger.error(error.stack);
         throw error; // Re-throw the error for higher-level handling
     }
 }

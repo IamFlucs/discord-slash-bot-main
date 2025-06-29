@@ -2,6 +2,9 @@ const { riotApiKey } = require('../../../config.json');
 const { createLogger } = require('../../utils/logger/logger');
 const axios = require('axios');
 
+const debugLog = false;
+const logger = createLogger(debugLog);
+
 /**
  * Search for a summoner by game name, region, and tag.
  * @param {string} puuid - The universal unique id.
@@ -9,17 +12,20 @@ const axios = require('axios');
  * @returns {Promise<Object>} - Get current game information for the given puuid.
  */
 async function searchCurrentGame(puuid, subRegion) {
-    const debugLog = false;
-    const logger = createLogger(debugLog);
+
 
     const riotURL = `.api.riotgames.com/lol/spectator/v5/active-games/by-summoner/`;
     const fetchSummoner = `https://${subRegion}${riotURL}${puuid}?api_key=${riotApiKey}`;
 
     try {
+        logger.info('');
+        logger.phase(`[spectator-v5] Called with puuid=${puuid}, subRegion=${subRegion}`);
+        logger.info(`[spectator-v5] Request URL : ${fetchSummoner}`);
+
         const response = await axios.get(fetchSummoner);
-        logger.info('API response:', JSON.stringify(response.data, null, 2));
-        
+        // logger.info('[spectator-v5] API response:', JSON.stringify(response.data, null, 2));
         return response.data;
+
     } catch (error) {
         if (error.response) {
             if (error.response.status === 404){

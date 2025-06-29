@@ -11,17 +11,17 @@
   <br/><br/>
   <a target="_blank" href="https://github.com/IamFlucs/discord-slash-bot-main"><img src="https://img.shields.io/badge/Language-JS-3ce5de?logo=nodedotjs&color=2370d5&logoColor=fff" alt="Last commit"/></a>
   <a href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-2379e9?logo=opensourceinitiative&logoColor=fff" alt="License MIT"/></a>
-  <a href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/README.md"><img src="https://img.shields.io/badge/version-v1.2.0-2673d8?logo=hackthebox&logoColor=fff" alt="Current Version"/></a>
+  <a href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/README.md"><img src="https://img.shields.io/badge/version-v1.3.1-2673d8?logo=hackthebox&logoColor=fff" alt="Current Version"/></a>
   <br/><br/>
   <a target="_blank" href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/README.md"><img src="https://img.shields.io/badge/discord.js-v14.14.1-5865F2?logo=Discord&logoColor=fff"/></a>
   <a target="_blank" href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/src/database/schemas/README.md"><img src="https://img.shields.io/badge/MongoDB-v4.4-47A248?logo=MongoDB&logoColor=fff"/></a>
-  <a target="_blank" href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/src/api/riot/README.md"><img src="https://img.shields.io/badge/API-Riot Games-dc291e?logo=Riot Games&logoColor=fff"/></a>
+  <a target="_blank" href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/src/api/riot/README.md"><img src="https://img.shields.io/badge/API-Riot Games-dc291e?logo=RiotGames&logoColor=fff"/></a>
+  <a target="_blank" href="https://github.com/IamFlucs/discord-slash-bot-main/blob/main/src/api/riot/README.md"><img src="https://img.shields.io/badge/API-Twitter-151b23?logo=x&logoColor=fff"/></a>
   <br/><br/>
   <a href="https://github.com/IamFlucs/discord-slash-bot-main/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
   ·
   <a href="https://github.com/IamFlucs/discord-slash-bot-main/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
 </div>
-
 
 
 <!-- DESCRIPTION -->
@@ -112,27 +112,38 @@ EzBot is a Discord bot designed to provide detailed information about League of 
 </details>
 
 <details>
-    <summary><b>🪙 Weekly sale</b></summary>
-    <p>League of Legends feature that monitors Twitter for League of Legends Weekly Sales.<br>
-    Automatically posts updates in a specified channel.</p>
+    <summary><b>🪙 Weekly Sale</b></summary>
+    <p>
+      A League of Legends feature that automatically monitors Twitter for weekly skin sales, then posts updates to a specified Discord channel.<br>
+      Ideal for community servers that want to keep members informed of current deals in-game.
+    </p>
     <img src="https://github.com/user-attachments/assets/31c84669-41ec-4556-bf41-534138df6f8b" alt="Outer JPG" width="499">
     <p>&nbsp</p>
     <details>
-        <summary>Setup a weekly sale channel</summary>
-        <p>Use <code>/weekly-sale setup</code> to enable a weekly sale channel.</p>
-        <img src="https://github.com/user-attachments/assets/22a94d08-1a4a-496d-aabf-52e80d327996" alt="Inner GIF 1" width="650">
+        <summary>Setup a Weekly Sale Channel</summary>
+        <p>
+          Use the <code>/weekly-sale setup</code> command to enable automatic sale postings in a chosen channel.<br>
+          Sales are posted every Monday at 19:15.
+        </p>
+        <img src="https://github.com/user-attachments/assets/76f69534-46bd-469c-af9a-415489a0f33e" alt="Inner GIF 1" width="560">
         <p>&nbsp</p>
     </details>
     <details>
-        <summary>Disable a weekly sale channel</summary>
-        <p>Use <code>/weekly-sale disable</code> to disable a weekly sale channel.</p>
-        <img src="https://github.com/user-attachments/assets/a6d0ec9a-2fbc-4be4-aa2b-b69dd0c1ade8" alt="Inner GIF 2" width="650">
+        <summary>Disable the Weekly Sale Channel</summary>
+        <p>
+          Use <code>/weekly-sale disable</code> to deactivate the feature in the selected channel.<br>
+          This will stop the bot from posting weekly sale updates there.
+        </p>
+        <img src="https://github.com/user-attachments/assets/389a8f87-c1b6-4496-a2ef-0584f6f2dcc1" alt="Inner GIF 2" width="560">
         <p>&nbsp</p>
     </details>
     <details>
-        <summary>List all weekly sale channels</summary>
-        <p>Use <code>/weekly-sale list</code> to show all weekly sale channels.</p>
-        <img src="https://github.com/user-attachments/assets/1ee059b5-64c9-40d7-942b-6cd62bf5b2a5" alt="Inner GIF 3" width="650">
+        <summary>List All Weekly Sale Channels</summary>
+        <p>
+          Use <code>/weekly-sale list</code> to display all channels currently configured for weekly sale updates.<br>
+          Helpful for server admins managing multiple channels.
+        </p>
+        <img src="https://github.com/user-attachments/assets/fa69ce2a-2da2-4aea-9473-f14dda45f57e" alt="Inner GIF 3" width="560">
     </details>
     <p>&nbsp</p>
 </details>
@@ -150,6 +161,7 @@ EzBot is a Discord bot designed to provide detailed information about League of 
 - MongoDB (4.4). My [`setup`](https://github.com/IamFlucs/discord-slash-bot-main/blob/main/src/database/README.md) cover only Ubuntu installation.
 - A Discord account and a server where you can add bots. See [`SETUP.md`](https://github.com/IamFlucs/discord-slash-bot-main/blob/main/SETUP.md) to setup your bot application.
 - A Riot Games API key. See [`Riot README.md`](https://github.com/IamFlucs/discord-slash-bot-main/blob/main/src/api/riot/README.md) for more information.
+- An X API key. See [`X README.md`](https://github.com/IamFlucs/discord-slash-bot-main/blob/main/src/api/twitter/README.md) for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -204,32 +216,41 @@ Once the bot is added to your Discord server, you will need to `/create-infochan
 <!-- ROADMAP -->
 ## Roadmap
 
-- [x] Database setup.
-- [x] Global command・implemant commands to be usable in every server the bot is.
-- [x] Join To Create・set up temporary voice channel.
-  - [x] Set up/disable join to create channel.
-  - [x] Behaviour of creating/deleting temporary voice channel detecting user activity.
-  - [x] List configured channels.
-- [x] LoL feature・Information Channel (edit an InfoPanel message with information about registered League of Legends players.)
-  - [x] Make a full set of commands for player to register in the database.
-  - [x] InfoPanel・Display in game player first.
-  - [x] InfoPanel・Player ranking by soloq rank.
-  - [x] InfoPanel・Display last soloQ LP gain/loss.
-  - [x] Game Card option・Toggle it to send information card in the InfoChannel. Default = false. 
-    - [x] Game Card creation.
-    - [x] Game Card update handler with suppression of old game card.
-- [x] LoL feature・Rank Update Channel (sends periodically update about the climb of players.)
-  - [x] RankChannel・Handle LP variation in the database.
-  - [x] RankChannel・Create embeds depending of the period.
-- [x] LoL feature・Web scraping to get skin sales
-- [ ] Member count・display in a channel the number of people in the server.
-- [ ] Minecraft server status・display in a chanel the status of a Minecraft server.
-- [ ] Welcome messages・randomize welcome messages.
-- [ ] Leaving messages・randomize leaving messages.
-- [ ] Call of Duty API・commands to track stats of players. InfoChannel for kda?
-- [ ] Reaction Roles・create an embed with reactions attributing roles by reacting to them like [Carl Bot](https://github.com/dhvitOP/multiple-purpose-discord-bot-like-carlbot/blob/master/commands/🎭Reaction%20Roles/create.js)
-- [ ] Button Roles・create an embed with buttons attributing roles. [Example](https://github.com/Only-Moon/Comfi/blob/master/commands/roles/buttonroles.js)
+### Core Features
+- [x] Database setup  
+- [x] Global commands・Implement commands so they are usable across all servers the bot is in
 
+### Voice Channel System (Join to Create)
+- [x] Set up / disable Join to Create channel  
+- [x] Auto-manage temporary voice channels based on user activity  
+- [x] List all configured Join to Create channels  
+
+### League of Legends Integration
+
+#### InfoChannel (InfoPanel)
+- [x] Full command set for players to register in the database  
+- [x] Display in-game players first  
+- [x] Rank players based on their SoloQ rank  
+- [x] Show last SoloQ LP gain/loss・This feature has been **deactivated** because InfoPanel was too long  
+- [x] Game Card option・Toggle to send game cards in the InfoChannel (default = false)  
+  - [x] Create game cards  
+  - [x] Update handler with removal of old game cards  
+
+#### Rank Update Channel
+- [x] Track LP variation in the database  
+- [x] Generate periodic rank updates via embeds  
+
+#### Skin Sales Scraping (X integration)
+- [x] Web scraping system to retrieve discounted skins・Runs every Monday at 19:00 using the Twitter API  
+
+### Upcoming Features
+- [ ] Member Count Channel・Display the current number of server members in a voice/text channel  
+- [ ] Minecraft Server Status・Display the status of a Minecraft server in a designated channel  
+- [ ] Welcome Messages・Send randomized welcome messages when a new member joins  
+- [ ] Leave Messages・Send randomized messages when a member leaves  
+- [ ] Call of Duty API Integration・Commands to track player stats → Possibly add InfoChannel support for displaying KDA  
+- [ ] Reaction Roles・Create an embed where users can react to assign themselves roles → Inspired by [Carl Bot](https://github.com/dhvitOP/multiple-purpose-discord-bot-like-carlbot/blob/master/commands/🎭Reaction%20Roles/create.js)  
+- [ ] Button Roles・Create an embed with clickable buttons to assign roles → Example from [Comfi](https://github.com/Only-Moon/Comfi/blob/master/commands/roles/buttonroles.js)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -277,6 +298,7 @@ I would like to give credit to the resources and individuals who have been helpf
 
 - KaluNight with his repository [Zoe-Discord-Bot](https://github.com/Zoe-Discord-Bot/Zoe-Discord-Bot)
 - [Shields.io](https://shields.io/badges/static-badge)
+- [Simple Icons](https://simpleicons.org/)
 
 Your support and contributions are greatly appreciated!
 

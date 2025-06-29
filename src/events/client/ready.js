@@ -11,7 +11,7 @@ module.exports = {
 	async execute(client) {
 
         client.user.setPresence({
-			activities: [{ name: '/help | v1.2.0', type: ActivityType.Playing }], 
+			activities: [{ name: '/help | v1.3.1', type: ActivityType.Playing }], 
 			status: 'online' 
 		});
 		logger.info(`${client.user.username} is up and running!`);

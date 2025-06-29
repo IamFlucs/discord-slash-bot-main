@@ -16,27 +16,30 @@ module.exports = {
     once: true,
     async execute(client) {
 
-        // Schedule the task to run at a regular interval (e.g., every monday at 7 PM '0 19 * * 1')
+        // Schedule the task to run at a regular interval (e.g., every monday at 7:15 PM '15 19 * * 1')
         cron.schedule(`15 19 * * 1`, async () => {
             try {
+                logger.info('');
+                logger.info('************************************************************');
+                logger.info(`[cronWeeklySale] Starting League of Legends weekly sale post`);
+                logger.info('************************************************************');
                 // Fetch all weekly-sale_channel_IDs from the database
                 const guilds = await wsSchema.find({});
                 for (const guild of guilds) {
 
                     const guildId = guild.ws_fk_guildId;
+                    const channelName = guild.ws_channelName;
                     const channelId = guild.ws_channelId;
-
-                    // Post weekly sale for every channel found
-                    logger.info('🔄 Running Weekly Sale cron job...');
+                    logger.info(`[cronWeeklySale] Target channel: ${channelName}.`);
                     await createWeeklySaleEmbed(client, guildId, channelId);
                     
                 }
             } catch (error) {
-                logger.warning('Error fetching guilds or updating in the cron job.');
+                logger.error('[cronWeeklySale] Error fetching guilds or updating in the cron job.');
                 logger.error(error);
             }
         });
 
-        logger.ok('>> Crontab for Weekly sale has been set up.');
+        logger.ok('>> Crontab for Weekly Sale has been set up.');
     }
 };

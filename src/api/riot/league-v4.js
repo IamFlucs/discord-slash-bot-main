@@ -2,27 +2,29 @@ const { riotApiKey } = require('../../../config.json');
 const { createLogger } = require('../../utils/logger/logger');
 const axios = require('axios');
 
-/**
- * Search all league entries (rank) for a summoner.
- * @param {string} summonerId - The summonerData.id.
- * @param {string} subRegion - The region of the summoner.
- * @returns {Promise<Object>} - Get league entries in all queues for a given summoner ID.
- */
-async function searchRank(summonerId, subRegion) {
-    const debugLog = false;
-    const logger = createLogger(debugLog);
+const debugLog = false;
+const logger = createLogger(debugLog);
 
-    const riotURL = `.api.riotgames.com/lol/league/v4/entries/by-summoner/`;
-    const fetchSummoner = `https://${subRegion}${riotURL}${summonerId}?api_key=${riotApiKey}`;
+/**
+ * Search rank informations in league for a summoner.
+ * Get /lol/league/v4/entries/by-puuid/{encryptedPUUID}
+ * @param {string} encryptedPUUID - The encryptedPUUID.
+ * @param {string} subRegion - The region of the summoner.
+ * @returns {Promise<Object>} - Get league entries in all queues for a given encryptedPUUID.
+ */
+async function searchRank(encryptedPUUID, subRegion) {
+    const riotURL = `.api.riotgames.com/lol/league/v4/entries/by-puuid/`;
+    const fetchSummoner = `https://${subRegion}${riotURL}${encryptedPUUID}?api_key=${riotApiKey}`;
 
     try {
+        logger.info('');
+        logger.phase(`[league-v4] Called with encryptedPUUID=${encryptedPUUID}, subRegion=${subRegion}`);
+        logger.info(`[league-v4] Request URL : ${fetchSummoner}`);
+        
         const response = await axios.get(fetchSummoner);
-        logger.info('API response:', JSON.stringify(response.data, null, 2));
         return response.data;
 
     } catch (error) {
-        logger.info('Error details:', JSON.stringify(error.response ? error.response.data : error, null, 2));
-
         if (error.response) {
             if (error.response && error.response.data.status) {
                 // The request was made and the server responded with a status object

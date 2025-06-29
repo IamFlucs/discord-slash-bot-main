@@ -14,20 +14,22 @@ const logger = createLogger(debugLog);
  */
 async function updateInfoPanel(client, guildId) {
     try {
+        logger.info('');
+        logger.info(`[updateInfoPanel] Called with guildId=${guildId}`);
         const newTimestamp = createTimestamp();
 
         // Check if the bot is still in the guild
         const guild = client.guilds.cache.get(guildId);
         if (!guild) {
-            // logger.debug(`The bot is no longer a member of the guild with ID: ${guildId}`);
+            logger.warning(`[updateInfoPanel] The bot is no longer a member of the Discord server (ID=${guildId})`);
+            logger.warning('[updateInfoPanel] Aborting function')
             return;
         }
 
-        // Find the info Channel
+        // Get the Info Channel in the database
         const searchedInfoChannel = await InfoChannel.findOne({ infoChannel_fk_guild: guildId });
         if (!searchedInfoChannel) {
-            // logger.debug('Failed to find the info channel entry.');
-            // We don't log this case because all guild that don't have infoChannel will pop an Error.
+            // All guild that don't have infoChannel will pop an Error.
             // TODO: create a boolean in guild.js to quickly filter which guild has an infoChannel.
             return;
         }
@@ -37,7 +39,7 @@ async function updateInfoPanel(client, guildId) {
         // Find the info Panel
         const searchedInfoPanel = await InfoPanel.findOne({ infoPanel_fk_infoChannel: searchedInfoChannel._id });
         if (!searchedInfoPanel) {
-            logger.error('Failed to find the info panel entry.');
+            logger.error('[updateInfoPanel] Failed to find the info panel entry.');
             return;
         }
 
@@ -47,13 +49,13 @@ async function updateInfoPanel(client, guildId) {
         // Fetch the channel and message
         const channel = await client.channels.fetch(channelId);
         if (!channel) {
-            logger.error('Failed to fetch the channel.');
+            logger.error('[updateInfoPanel] Failed to fetch the channel.');
             return;
         }
 
         const message = await channel.messages.fetch(searchedInfoPanel.infoPanel_messageId);
         if (!message) {
-            logger.error('Failed to fetch the message.');
+            logger.error('[updateInfoPanel] Failed to fetch the message.');
             return;
         }
 
@@ -69,12 +71,11 @@ async function updateInfoPanel(client, guildId) {
             allowedMentions: { parse: [] }
         });
 
-        // logger.info(`Info panel updated successfully.`);
+        logger.info(`[updateInfoPanel] Info Panel updated successfully.`);
 
     } catch (error) {
-        logger.warning('/!\\ updateInfoPanel.js');
-        logger.error(`Refreshing info panel: ${error.message}`);
-        logger.error(error); 
+        logger.error(`[updateInfoPanel] Error refreshing info panel`);
+        logger.error(`${error}`); 
     }
 }
 
